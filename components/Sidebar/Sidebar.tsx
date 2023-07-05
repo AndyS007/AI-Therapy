@@ -1,18 +1,18 @@
-import { Conversation } from "@/types";
-import { IconPlus } from "@tabler/icons-react";
-import { FC } from "react";
-import { Conversations } from "../Conversations";
-import { SidebarSettings } from "./SidebarSettings";
-import { signOutUser } from "@/lib/firebase";
+import { Conversation } from '@/types'
+import { IconPlus } from '@tabler/icons-react'
+import { FC } from 'react'
+import { Conversations } from '../Conversations'
+import { SidebarSettings } from './SidebarSettings'
+import { signOutUser } from '@/lib/firebase'
 
 interface Props {
-  conversations: Conversation[];
-  lightMode: "light" | "dark";
-  selectedConversation: Conversation;
-  onNewConversation: () => void;
-  onToggleLightMode: (mode: "light" | "dark") => void;
-  onSelectConversation: (conversation: Conversation) => void;
-  onDeleteConversation: (conversation: Conversation) => void;
+  conversations: Conversation[]
+  lightMode: 'light' | 'dark'
+  selectedConversation: Conversation
+  onNewConversation: () => void
+  onToggleLightMode: (mode: 'light' | 'dark') => void
+  onSelectConversation: (conversation: Conversation) => void
+  onDeleteConversation: (conversation: Conversation) => void
 }
 
 export const Sidebar: FC<Props> = ({
@@ -51,5 +51,5 @@ export const Sidebar: FC<Props> = ({
         onToggleLightMode={onToggleLightMode}
       />
     </div>
-  );
-};
+  )
+}

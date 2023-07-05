@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC } from 'react'
 
 export const Navbar: FC = () => {
   return (
@@ -12,5 +12,5 @@ export const Navbar: FC = () => {
         </a>
       </div>
     </div>
-  );
-};
+  )
+}
