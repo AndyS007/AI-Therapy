@@ -1,9 +1,15 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth, signInWithEmailAndPassword, signOut, GoogleAuthProvider, 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  GoogleAuthProvider,
   createUserWithEmailAndPassword,
-  signInWithPopup} from "firebase/auth";
-
+  signInWithPopup,
+  AuthError,
+} from "firebase/auth";
+import toast from "react-hot-toast";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -25,19 +31,22 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// export type AuthError = FirebaseAuthError
 
 export const signInUser = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password)
-}
+  return signInWithEmailAndPassword(auth, email, password);
+};
 
 export const signUpUser = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password)
-}
+  return createUserWithEmailAndPassword(auth, email, password);
+};
 
-export const signInWithGoogle = () => {
-    return signInWithPopup(auth, provider);
-}
+export const signInWithGoogle = async () => {
+  await signInWithPopup(auth, provider);
+  toast.success("Signed in with Google");
+};
 
-export const signOutUser = () => {
-  return signOut(auth);
-}
+export const signOutUser = async () => {
+  signOut(auth);
+  toast.success("Signed out");
+};

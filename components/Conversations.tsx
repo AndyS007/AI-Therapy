@@ -9,23 +9,31 @@ interface Props {
   onDeleteConversation: (conversation: Conversation) => void;
 }
 
-export const Conversations: FC<Props> = ({ conversations, selectedConversation, onSelectConversation, onDeleteConversation }) => {
+export const Conversations: FC<Props> = ({
+  conversations,
+  selectedConversation,
+  onSelectConversation,
+  onDeleteConversation,
+}) => {
   return (
-    <div className="flex flex-col space-y-2">
+    <div className='flex flex-col space-y-2'>
       {conversations.map((conversation, index) => (
         <div
           key={index}
-          className={`flex items-center justify-start w-[240px] h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${selectedConversation.id === conversation.id ? "bg-slate-600" : ""}`}
+          className={`flex items-center justify-start w-[240px] h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${
+            selectedConversation.id === conversation.id ? "bg-slate-600" : ""
+          }`}
           onClick={() => onSelectConversation(conversation)}
         >
-          <IconMessage
-            className="mr-2 min-w-[20px]"
-            size={18}
-          />
-          <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1">{conversation.messages[0] ? conversation.messages[0].content : "Empty conversation"}</div>
+          <IconMessage className='mr-2 min-w-[20px]' size={18} />
+          <div className='overflow-hidden whitespace-nowrap overflow-ellipsis pr-1'>
+            {conversation.messages[0]
+              ? conversation.messages[0].content
+              : "Empty conversation"}
+          </div>
 
           <IconTrash
-            className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
+            className='ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100'
             size={18}
             onClick={(e) => {
               e.stopPropagation();
