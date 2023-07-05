@@ -1,3 +1,104 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --color-bg: #eef0f1;
+    --color-text: #08090a;
+    --color-blue: #3b49df;
+    --color-red: #df3b3b;
+    --color-green: #3bdf72;
+    --color-gray: #b5bdc4;
+}
+
+body {
+    background-color: var(--color-bg);
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-title {
+    font-size: 2rem;
+}
+
+.login-form-container {
+    width: 400px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.login-input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 16px;
+}
+
+.login-input:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.login-button {
+    padding: 0.5rem 1rem;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #005cbf;
+}
+
+.signup-link {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.switch-button {
+    background-color: transparent;
+    color: #0070f3;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.google-signin-button {
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    background-color: white;
+    color: black;
+    border-radius: 0.25rem;
+    font-size: 16px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+.google-signin-button img {
+    width: 30px;
+    margin-right: 20px;
+}
+
+.google-signin-button:hover {
+    filter: brightness(90%);
+}

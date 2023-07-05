@@ -3,6 +3,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { FC } from "react";
 import { Conversations } from "../Conversations";
 import { SidebarSettings } from "./SidebarSettings";
+import { signOutUser } from "@/lib/firebase";
 
 interface Props {
   conversations: Conversation[];
@@ -14,7 +15,15 @@ interface Props {
   onDeleteConversation: (conversation: Conversation) => void;
 }
 
-export const Sidebar: FC<Props> = ({ conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation }) => {
+export const Sidebar: FC<Props> = ({
+  conversations,
+  lightMode,
+  selectedConversation,
+  onNewConversation,
+  onToggleLightMode,
+  onSelectConversation,
+  onDeleteConversation,
+}) => {
   return (
     <div className="flex flex-col bg-[#202123] min-w-[260px]">
       <div className="flex items-center justify-center h-[60px]">
@@ -22,10 +31,7 @@ export const Sidebar: FC<Props> = ({ conversations, lightMode, selectedConversat
           className="flex items-center w-[240px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
           onClick={onNewConversation}
         >
-          <IconPlus
-            className="ml-4 mr-3"
-            size={16}
-          />
+          <IconPlus className="ml-4 mr-3" size={16} />
           New chat
         </button>
       </div>
@@ -39,6 +45,7 @@ export const Sidebar: FC<Props> = ({ conversations, lightMode, selectedConversat
         />
       </div>
 
+      <button onClick={signOutUser}>Sign Out</button>
       <SidebarSettings
         lightMode={lightMode}
         onToggleLightMode={onToggleLightMode}
