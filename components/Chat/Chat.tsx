@@ -39,7 +39,7 @@ export const Chat: FC<Props> = ({
           </div>
 
           <div className="flex-1 text-4xl text-center text-neutral-300 pt-[280px]">
-            Chatbot UI Pro
+            AI Therapy
           </div>
         </>
       ) : (
