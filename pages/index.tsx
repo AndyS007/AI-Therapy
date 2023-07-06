@@ -10,7 +10,7 @@ const Home = () => {
   const { user, loading } = useUser()
   const router = useRouter()
   if (loading) {
-    return <>Loading</>
+    return <></>
   } else if (!user) {
     router.replace('/login')
   } else {

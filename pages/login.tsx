@@ -8,6 +8,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { AuthError } from 'firebase/auth'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -92,7 +93,8 @@ const Login = () => {
             className="google-signin-button"
             onClick={signInWithGoogle}
           >
-            <img src={'/google.png'} width="30px" alt="" /> Sign in with Google
+            <Image src={'/google.png'} width="30" height="30" alt="" /> Sign in
+            with Google
           </button>
         </form>
       </div>

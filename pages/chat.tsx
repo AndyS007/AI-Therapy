@@ -19,7 +19,7 @@ export default function Home() {
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>()
   const [loading, setLoading] = useState<boolean>(false)
-  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5)
+  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5_16K)
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark')
 
   const handleSend = async (message: Message) => {
