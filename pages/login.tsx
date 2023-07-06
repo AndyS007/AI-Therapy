@@ -1,12 +1,25 @@
-import { useState } from 'react'
-import { signInUser, signInWithGoogle, signUpUser } from '@lib/firebase'
+import { useEffect, useState } from 'react'
+import {
+  signInUser,
+  signInWithGoogle,
+  signUpUser,
+  useUser,
+} from '@lib/firebase'
 import { toast } from 'react-hot-toast'
 import { AuthError } from 'firebase/auth'
+import { useRouter } from 'next/router'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(true)
+  const router = useRouter()
+  const { user } = useUser()
+  useEffect(() => {
+    if (user) {
+      router.replace('/')
+    }
+  }, [user, router])
 
   const handleSignInOrSighUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -79,7 +92,7 @@ const Login = () => {
             className="google-signin-button"
             onClick={signInWithGoogle}
           >
-            <img src={'/google.png'} width="30px" /> Sign in with Google
+            <img src={'/google.png'} width="30px" alt="" /> Sign in with Google
           </button>
         </form>
       </div>

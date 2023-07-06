@@ -1,17 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Login from './login'
 import Chat from './chat'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { useUser } from '@/lib/firebase'
+import { useRouter } from 'next/router'
+import { auth } from '@/lib/firebase'
 
 const Home = () => {
-  const [loggedIn, setLoggedIn] = useState(false)
-
-  const auth = getAuth()
-  onAuthStateChanged(auth, (user) => {
-    setLoggedIn(!!user)
-  })
-
-  return <div>{loggedIn ? <Chat /> : <Login />}</div>
+  const { user, loading } = useUser()
+  const router = useRouter()
+  if (loading) {
+    return <>Loading</>
+  } else if (!user) {
+    router.replace('/login')
+  } else {
+    return <Chat />
+  }
 }
 
 export default Home

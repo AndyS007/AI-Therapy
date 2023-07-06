@@ -1,10 +1,20 @@
 import { Chat } from '@/components/Chat/Chat'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
+import { auth, useUser } from '@/lib/firebase'
 import { Conversation, Message, OpenAIModel } from '@/types'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const router = useRouter()
+  const { user } = useUser()
+  useEffect(() => {
+    if (!user) {
+      router.replace('/login')
+    }
+  }, [user, router])
+
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>()

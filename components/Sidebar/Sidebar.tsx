@@ -45,7 +45,6 @@ export const Sidebar: FC<Props> = ({
         />
       </div>
 
-      <button onClick={signOutUser}>Sign Out</button>
       <SidebarSettings
         lightMode={lightMode}
         onToggleLightMode={onToggleLightMode}

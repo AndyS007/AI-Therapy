@@ -8,7 +8,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   AuthError,
+  onAuthStateChanged,
+  User,
 } from 'firebase/auth'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 // Your web app's Firebase configuration
@@ -49,4 +52,24 @@ export const signInWithGoogle = async () => {
 export const signOutUser = async () => {
   signOut(auth)
   toast.success('Signed out')
+}
+
+export type FirebaseUserState = User | null
+
+export function useUser() {
+  const [user, setUser] = useState<FirebaseUserState>(auth.currentUser)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user)
+      setLoading(false)
+    })
+
+    // unsubscribe to the listener when unmounting
+    return () => unsubscribe()
+  }, [])
+
+  return { user, loading }
 }
