@@ -1,9 +1,7 @@
 import { IconMoon, IconSun, IconLogout } from '@tabler/icons-react'
 import { FC } from 'react'
 import { SidebarButton } from './SidebarButton'
-import { sign } from 'crypto'
-import { signOutUser } from '@/lib/firebase'
-import { Router } from 'next/router'
+import { useAuth } from '../AuthProvider'
 
 interface Props {
   lightMode: 'light' | 'dark'
@@ -14,15 +12,14 @@ export const SidebarSettings: FC<Props> = ({
   lightMode,
   onToggleLightMode,
 }) => {
+  const { logOut } = useAuth()
   return (
     <>
       <div className="flex flex-col items-center border-t border-neutral-500 py-4">
         <SidebarButton
           text={'Log out'}
           icon={<IconLogout />}
-          onClick={async () => {
-            await signOutUser()
-          }}
+          onClick={logOut}
         />
       </div>
       <div className="flex flex-col items-center border-t border-neutral-500 py-4">

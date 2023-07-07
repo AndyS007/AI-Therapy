@@ -1,6 +1,6 @@
+import { useAuth } from '@/components/AuthProvider'
 import { Chat } from '@/components/Chat/Chat'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
-import { auth, useUser } from '@/lib/firebase'
 import { Conversation, Message, OpenAIModel } from '@/types'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -8,12 +8,12 @@ import { useEffect, useState } from 'react'
 
 export default function Home() {
   const router = useRouter()
-  const { user, loading: userLoading } = useUser()
+  const { currentUser } = useAuth()
   useEffect(() => {
-    if (!userLoading && !user) {
+    if (!currentUser) {
       router.replace('/login')
     }
-  }, [user, userLoading, router])
+  }, [currentUser, router])
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] =
@@ -217,44 +217,40 @@ export default function Home() {
     }
   }, [])
 
-  if (userLoading) {
-    return null // Render an empty page or a loading indicator
-  } else {
-    return (
-      <>
-        <Head>
-          <title>Chatbot UI</title>
-          <meta
-            name="description"
-            content="A simple chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
+  return (
+    <>
+      <Head>
+        <title>Chatbot UI</title>
+        <meta
+          name="description"
+          content="A simple chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      {selectedConversation && (
+        <div className={`flex h-screen text-white ${lightMode}`}>
+          <Sidebar
+            conversations={conversations}
+            lightMode={lightMode}
+            selectedConversation={selectedConversation}
+            onToggleLightMode={handleLightMode}
+            onNewConversation={handleNewConversation}
+            onSelectConversation={handleSelectConversation}
+            onDeleteConversation={handleDeleteConversation}
           />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        {selectedConversation && (
-          <div className={`flex h-screen text-white ${lightMode}`}>
-            <Sidebar
-              conversations={conversations}
-              lightMode={lightMode}
-              selectedConversation={selectedConversation}
-              onToggleLightMode={handleLightMode}
-              onNewConversation={handleNewConversation}
-              onSelectConversation={handleSelectConversation}
-              onDeleteConversation={handleDeleteConversation}
-            />
 
-            <div className="flex flex-col w-full h-full dark:bg-[#343541]">
-              <Chat
-                model={model}
-                messages={selectedConversation.messages}
-                loading={loading}
-                onSend={handleSend}
-                onSelect={setModel}
-              />
-            </div>
+          <div className="flex flex-col w-full h-full dark:bg-[#343541]">
+            <Chat
+              model={model}
+              messages={selectedConversation.messages}
+              loading={loading}
+              onSend={handleSend}
+              onSelect={setModel}
+            />
           </div>
-        )}
-      </>
-    )
-  }
+        </div>
+      )}
+    </>
+  )
 }

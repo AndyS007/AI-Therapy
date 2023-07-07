@@ -1,36 +1,29 @@
 import { useEffect, useState } from 'react'
-import {
-  signInUser,
-  signInWithGoogle,
-  signUpUser,
-  useUser,
-} from '@lib/firebase'
 import { toast } from 'react-hot-toast'
 import { AuthError } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import { useAuth } from '@/components/AuthProvider'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(true)
   const router = useRouter()
-  const { user } = useUser()
+  const { currentUser, signInWithGoogle, logIn, signUp } = useAuth()
   useEffect(() => {
-    if (user) {
+    if (currentUser) {
       router.replace('/')
     }
-  }, [user, router])
+  }, [currentUser, router])
 
   const handleSignInOrSighUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       if (isLoggingIn) {
-        await signInUser(email, password)
-        toast.success('Logged in successfully')
+        await logIn(email, password)
       } else {
-        await signUpUser(email, password)
-        toast.success('Signed up successfully')
+        await signUp(email, password)
       }
     } catch (error) {
       console.error(error)

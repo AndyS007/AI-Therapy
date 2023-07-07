@@ -3,7 +3,6 @@ import { IconPlus } from '@tabler/icons-react'
 import { FC } from 'react'
 import { Conversations } from '../Conversations'
 import { SidebarSettings } from './SidebarSettings'
-import { signOutUser } from '@/lib/firebase'
 
 interface Props {
   conversations: Conversation[]
