@@ -1,5 +1,7 @@
-import { Message, OpenAIModel } from '@/types'
+import { Message, OpenAIModel } from '@/types/openai'
 import { OpenAIStream } from '@/utils'
+import { ChatBody } from '@/types/chat'
+import { DEFAULT_SYSTEM_PROMPT } from '@/types/prompt'
 
 export const config = {
   runtime: 'edge',
@@ -7,9 +9,11 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages } = (await req.json()) as {
-      model: OpenAIModel
-      messages: Message[]
+    const { model, messages, prompt } = (await req.json()) as ChatBody
+    let promptToSend = prompt
+
+    if (!promptToSend) {
+      promptToSend = DEFAULT_SYSTEM_PROMPT
     }
 
     const charLimit = 12000
@@ -23,9 +27,10 @@ const handler = async (req: Request): Promise<Response> => {
       }
       charCount += message.content.length
       messagesToSend.push(message)
+      console.log(messagesToSend)
     }
 
-    const stream = await OpenAIStream(model, messagesToSend)
+    const stream = await OpenAIStream(model, messagesToSend, promptToSend)
 
     return new Response(stream)
   } catch (error) {

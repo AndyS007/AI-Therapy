@@ -1,4 +1,4 @@
-import { Conversation } from '@/types'
+import { Conversation } from '@/types/openai'
 import { IconPlus } from '@tabler/icons-react'
 import { FC } from 'react'
 import { Conversations } from '../Conversations'

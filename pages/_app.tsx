@@ -1,4 +1,3 @@
-import { FirebaseUserState } from '@/lib/firebase'
 import { AuthProvider } from '@/components/AuthProvider'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'

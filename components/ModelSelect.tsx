@@ -1,4 +1,4 @@
-import { OpenAIModel, OpenAIModelNames } from '@/types'
+import { OpenAIModel, OpenAIModelNames } from '@/types/openai'
 import { FC } from 'react'
 
 interface Props {

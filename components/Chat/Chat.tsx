@@ -1,4 +1,4 @@
-import { Message, OpenAIModel, OpenAIModelNames } from '@/types'
+import { Message, OpenAIModel, OpenAIModelNames } from '@/types/openai'
 import { FC, useEffect, useRef } from 'react'
 import { ModelSelect } from '../ModelSelect'
 import { ChatInput } from './ChatInput'
@@ -7,6 +7,7 @@ import { ChatMessage } from './ChatMessage'
 
 interface Props {
   model: OpenAIModel
+  stage: number | undefined
   messages: Message[]
   loading: boolean
   onSend: (message: Message) => void
@@ -15,6 +16,7 @@ interface Props {
 
 export const Chat: FC<Props> = ({
   model,
+  stage,
   messages,
   loading,
   onSend,
@@ -46,7 +48,8 @@ export const Chat: FC<Props> = ({
         <>
           <div className="flex-1 overflow-auto">
             <div className="text-center py-3 dark:bg-[#434654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">
-              Model: {OpenAIModelNames[model]}
+              {/*Model: {OpenAIModelNames[model]}*/}
+              Stage: {stage}
             </div>
 
             {messages.map((message, index) => (

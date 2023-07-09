@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { AuthError } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
+import { AuthErrorCode } from '@firebase/auth/internal'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(true)
   const router = useRouter()
   const { currentUser, signInWithGoogle, logIn, signUp } = useAuth()
@@ -17,13 +19,25 @@ const Login = () => {
     }
   }, [currentUser, router])
 
+  const checkPasswordsMatch = () => {
+    if (password !== confirmPassword) {
+      setPassword('')
+      setConfirmPassword('')
+      toast.error('Passwords do not match')
+      return false
+    } else {
+      return true
+    }
+  }
   const handleSignInOrSighUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       if (isLoggingIn) {
         await logIn(email, password)
       } else {
-        await signUp(email, password)
+        if (checkPasswordsMatch()) {
+          await signUp(email, password)
+        }
       }
     } catch (error) {
       console.error(error)
@@ -55,6 +69,15 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {!isLoggingIn && (
+            <input
+              type="password"
+              className="login-input"
+              placeholder="ConfirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          )}
           {isLoggingIn ? (
             <div className="signup-link">
               Don&apos;t have an account?{' '}

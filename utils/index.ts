@@ -1,11 +1,20 @@
-import { Message, OpenAIModel } from '@/types'
+import { Message, OpenAIModel } from '@/types/openai'
 import {
   createParser,
   ParsedEvent,
   ReconnectInterval,
 } from 'eventsource-parser'
 
-export const OpenAIStream = async (model: OpenAIModel, messages: Message[]) => {
+interface Props {
+  model: OpenAIModel
+  messages: Message[]
+  systemPrompt: string
+}
+export const OpenAIStream = async (
+  model: OpenAIModel,
+  messages: Message[],
+  systemPrompt: string,
+) => {
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
 
@@ -20,7 +29,7 @@ export const OpenAIStream = async (model: OpenAIModel, messages: Message[]) => {
       messages: [
         {
           role: 'system',
-          content: `You are a helpful, friendly, assistant.`,
+          content: systemPrompt,
         },
         ...messages,
       ],

@@ -1,4 +1,4 @@
-import { Conversation } from '@/types'
+import { Conversation } from '@/types/openai'
 import { IconMessage, IconTrash } from '@tabler/icons-react'
 import { FC } from 'react'
 

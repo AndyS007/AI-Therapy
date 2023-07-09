@@ -1,7 +1,12 @@
 import { useAuth } from '@/components/AuthProvider'
 import { Chat } from '@/components/Chat/Chat'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
-import { Conversation, Message, OpenAIModel } from '@/types'
+import {
+  Conversation,
+  Message,
+  newConversation,
+  OpenAIModel,
+} from '@/types/openai'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -143,6 +148,7 @@ export default function Home() {
       id: conversations.length + 1,
       name: '',
       messages: [],
+      stage: 1,
     }
 
     const updatedConversations = [...conversations, newConversation]
@@ -184,11 +190,7 @@ export default function Home() {
         JSON.stringify(updatedConversations[0]),
       )
     } else {
-      setSelectedConversation({
-        id: 1,
-        name: '',
-        messages: [],
-      })
+      setSelectedConversation(newConversation)
       localStorage.removeItem('selectedConversation')
     }
   }
@@ -209,22 +211,15 @@ export default function Home() {
     if (selectedConversation) {
       setSelectedConversation(JSON.parse(selectedConversation))
     } else {
-      setSelectedConversation({
-        id: 1,
-        name: '',
-        messages: [],
-      })
+      setSelectedConversation(newConversation)
     }
   }, [])
 
   return (
     <>
       <Head>
-        <title>Chatbot UI</title>
-        <meta
-          name="description"
-          content="A simple chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
-        />
+        <title>AI Therapy</title>
+        <meta name="description" content="An AI Therapist powered by OpenAI" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -244,6 +239,7 @@ export default function Home() {
             <Chat
               model={model}
               messages={selectedConversation.messages}
+              stage={selectedConversation.stage}
               loading={loading}
               onSend={handleSend}
               onSelect={setModel}

@@ -1,4 +1,4 @@
-import { Message } from '@/types'
+import { Message } from '@/types/openai'
 import { FC } from 'react'
 
 interface Props {

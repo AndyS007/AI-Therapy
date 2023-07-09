@@ -21,4 +21,12 @@ export interface Conversation {
   id: number
   name: string
   messages: Message[]
+  stage: number
+}
+
+export const newConversation = {
+  id: 1,
+  name: '',
+  messages: [],
+  stage: 1,
 }
