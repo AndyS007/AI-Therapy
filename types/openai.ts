@@ -9,24 +9,3 @@ export const OpenAIModelNames: Record<OpenAIModel, string> = {
   [OpenAIModel.GPT_3_5_16K]: 'GPT-3.5 16K',
   [OpenAIModel.GPT_4]: 'GPT-4',
 }
-
-export interface Message {
-  role: Role
-  content: string
-}
-
-export type Role = 'assistant' | 'user'
-
-export interface Conversation {
-  id: number
-  name: string
-  messages: Message[]
-  stage: number
-}
-
-export const newConversation = {
-  id: 1,
-  name: '',
-  messages: [],
-  stage: 1,
-}

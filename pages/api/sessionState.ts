@@ -1,6 +1,10 @@
-import { OpenAIStream } from '@/utils'
 import { ChatBody } from '@/types/chat'
-import { DEFAULT_SYSTEM_PROMPT, systemPrompt } from '@/types/prompt'
+import {
+  DEFAULT_SYSTEM_PROMPT,
+  FUNCTION_TO_CALL,
+  systemPrompt,
+} from '@/types/prompt'
+import { functionCallResponse } from '@/utils'
 
 export const config = {
   runtime: 'edge',
@@ -14,6 +18,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!promptToSend) {
       promptToSend = DEFAULT_SYSTEM_PROMPT
     }
+    // console.log('promptToSend', promptToSend)
 
     const charLimit = 12000
     let charCount = 0
@@ -26,12 +31,15 @@ const handler = async (req: Request): Promise<Response> => {
       }
       charCount += message.content.length
       messagesToSend.push(message)
-      // console.log(messagesToSend)
     }
+    const res = await functionCallResponse(
+      model,
+      messagesToSend,
+      promptToSend,
+      FUNCTION_TO_CALL.SESSION_ENDED,
+    )
 
-    const stream = await OpenAIStream(model, messagesToSend, promptToSend)
-
-    return new Response(stream)
+    return res
   } catch (error) {
     console.error(error)
     return new Response('Error', { status: 500 })

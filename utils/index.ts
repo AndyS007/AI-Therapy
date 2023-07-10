@@ -1,9 +1,11 @@
-import { Message, OpenAIModel } from '@/types/openai'
+import { OpenAIModel } from '@/types/openai'
 import {
   createParser,
   ParsedEvent,
   ReconnectInterval,
 } from 'eventsource-parser'
+import { Message } from '@/types/chat'
+import { FUNCTION_CALLABLE, FUNCTION_TO_CALL } from '@/types/prompt'
 
 interface Props {
   model: OpenAIModel
@@ -74,4 +76,44 @@ export const OpenAIStream = async (
   })
 
   return stream
+}
+
+export const functionCallResponse = async (
+  model: OpenAIModel,
+  messages: Message[],
+  systemPrompt: string,
+  functionToCall: FUNCTION_TO_CALL,
+) => {
+  const encoder = new TextEncoder()
+  const decoder = new TextDecoder()
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      model,
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        ...messages,
+      ],
+
+      max_tokens: 800,
+      temperature: 0.0,
+      functions: [FUNCTION_CALLABLE[functionToCall]],
+      function_call: { name: functionToCall },
+    }),
+  })
+
+  if (res.status !== 200) {
+    throw new Error('OpenAI API returned an error')
+  }
+
+  // const data = await res.json()
+  return res
 }
