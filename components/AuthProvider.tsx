@@ -8,10 +8,11 @@ import {
   sendPasswordResetEmail,
   updateEmail as updateEmailFn,
   updatePassword as updatePasswordFn,
+  signInAnonymously as signInAnonymouslyFn,
   User as FirebaseUser,
   GoogleAuthProvider,
 } from 'firebase/auth'
-import { auth } from '../lib/firebase'
+import { auth } from '@lib/firebase'
 import { toast } from 'react-hot-toast'
 
 interface AuthContextProps {
@@ -23,6 +24,7 @@ interface AuthContextProps {
   resetPassword: (email: string) => Promise<void>
   updateEmail: (email: string) => Promise<void>
   updatePassword: (password: string) => Promise<void>
+  signInAnonymously: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -69,6 +71,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function updatePassword(password: string) {
     await updatePasswordFn(currentUser!, password)
   }
+  async function signInAnonymously() {
+    await signInAnonymouslyFn(auth)
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -88,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     resetPassword,
     updateEmail,
     updatePassword,
+    signInAnonymously,
   }
   return (
     <AuthContext.Provider value={value}>

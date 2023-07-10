@@ -12,7 +12,8 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(true)
   const router = useRouter()
-  const { currentUser, signInWithGoogle, logIn, signUp } = useAuth()
+  const { currentUser, signInWithGoogle, logIn, signUp, signInAnonymously } =
+    useAuth()
   useEffect(() => {
     if (currentUser) {
       router.replace('/')
@@ -103,6 +104,13 @@ const Login = () => {
           )}
           <button type="submit" className="login-button">
             {isLoggingIn ? 'Log In' : 'Sign Up'}
+          </button>
+          <button
+            type="button"
+            className="login-button"
+            onClick={signInAnonymously}
+          >
+            Sign In Anonymously
           </button>
           <button
             type="button"
