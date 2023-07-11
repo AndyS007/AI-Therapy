@@ -1,4 +1,4 @@
-import { Message } from '@/types/openai'
+import { Message } from '@/types/chat'
 import { IconSend } from '@tabler/icons-react'
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react'
 

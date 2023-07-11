@@ -1,21 +1,19 @@
-import { OpenAIModel } from '@/types/openai'
+import { OpenAIModel, OpenAIModelID } from '@/types/openai'
+import { SESSIONS } from '@/types/prompt'
 
 export interface Message {
   role: Role
   content: string
+  session?: SESSIONS
 }
 
 export interface ChatBody {
-  model: OpenAIModel
+  model: OpenAIModelID
   messages: Message[]
   // key: string
-  prompt: string
-  stage: number
+  prompt?: string
+  session: SESSIONS
   // temperature: number
-}
-export interface Message {
-  role: Role
-  content: string
 }
 
 export type Role = 'assistant' | 'user'
@@ -24,7 +22,7 @@ export const defaultConversation = {
   id: 1,
   name: '',
   messages: [],
-  stage: 1,
+  session: SESSIONS.START,
   sessionEnded: false,
 }
 
@@ -32,7 +30,7 @@ export interface Conversation {
   id: number
   name: string
   messages: Message[]
-  stage: number
+  session?: SESSIONS
   sessionEnded?: boolean
   model?: OpenAIModel
   // prompt: string

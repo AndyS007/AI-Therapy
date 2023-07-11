@@ -93,47 +93,34 @@ You are Carol, an AI grief therapist. You are having the third therapy session w
 Hello, I think today the focus will really be getting into some of the coping strategies. So, we spent the last two sessions getting a sense of what's going on for you and also some of the difficulties you have had, particularly in {Problem}. Now we are going to focus on some strategies regarding your situation. So, this is the agenda today, have does this sound to you?
 9: Pause and wait for my response after each question mark in your response
 10. Ask me if I understand the goal first, and then make suggestions.
-
 `
 
-export const systemPrompt: string[] = [
-  firstStagePrompt,
-  secondStagePrompt,
-  thirdStagePrompt,
-]
+// export enum SESSIONS {
+//   START,
+//   GOAL_SETTING,
+//   TREATMENT_PLAN,
+//   OPEN_CHAT,
+// }
+export enum SESSIONS {
+  START = 'Start',
+  GOAL_SETTING = 'Goal Setting',
+  TREATMENT_PLAN = 'Treatment Plan',
+  OPEN_CHAT = 'Open Chat',
+}
 
-export enum SYSTEM_PROMPT {}
-
-export const functionPrompt: string = `
-"functions": [
-  {
-    "name": "enter_next_step",
-    "description": "Based on the therapy conversation to detemine whether the current therapy session is finished",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "finished": {
-          "type": "boolean",
-          "description": "Whether the current therapy session is finished"
-        }
-      },
-      "required": ["finished"]
-    }
-  },
-  {
-    "name": "generate_summary",
-    "description": "Based on the therapy conversation to generate a summary of the therapy session according to the Problem Statement Example",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "summary": {
-          "type": "string",
-          "description": "The summary of the therapy session according to the Problem Statement Example"
-        }
-      },
-      "required": ["summay"]
-    }
+export function incrementSession(currentSession: SESSIONS): SESSIONS {
+  const sessionIndex = Object.values(SESSIONS).indexOf(currentSession)
+  if (
+    sessionIndex !== -1 &&
+    sessionIndex < Object.values(SESSIONS).length - 1
+  ) {
+    return Object.values(SESSIONS)[sessionIndex + 1]
   }
-],
-"function_call": { "name": "enter_next_step" }
-`
+  return currentSession // Return last session if the current session is invalid or the last session itself
+}
+export const SYSTEM_PROMPT: Record<SESSIONS, string> = {
+  [SESSIONS.START]: firstStagePrompt,
+  [SESSIONS.GOAL_SETTING]: secondStagePrompt,
+  [SESSIONS.TREATMENT_PLAN]: thirdStagePrompt,
+  [SESSIONS.OPEN_CHAT]: DEFAULT_SYSTEM_PROMPT,
+}

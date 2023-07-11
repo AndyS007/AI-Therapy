@@ -2,9 +2,9 @@ import { ChatBody } from '@/types/chat'
 import {
   DEFAULT_SYSTEM_PROMPT,
   FUNCTION_TO_CALL,
-  systemPrompt,
+  SYSTEM_PROMPT,
 } from '@/types/prompt'
-import { functionCallResponse } from '@/utils'
+import { functionCallResponse, extractMessages } from '@/utils'
 
 export const config = {
   runtime: 'edge',
@@ -12,26 +12,17 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, prompt, stage } = (await req.json()) as ChatBody
-    let promptToSend = systemPrompt[stage - 1]
+    const { model, messages, prompt, session } = (await req.json()) as ChatBody
+    let promptToSend = SYSTEM_PROMPT[session]
 
-    if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT
-    }
     // console.log('promptToSend', promptToSend)
+    let messagesToSend = await extractMessages(
+      messages,
+      model,
+      session,
+      promptToSend,
+    )
 
-    const charLimit = 12000
-    let charCount = 0
-    let messagesToSend = []
-
-    for (let i = 0; i < messages.length; i++) {
-      const message = messages[i]
-      if (charCount + message.content.length > charLimit) {
-        break
-      }
-      charCount += message.content.length
-      messagesToSend.push(message)
-    }
     const res = await functionCallResponse(
       model,
       messagesToSend,

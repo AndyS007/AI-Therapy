@@ -1,9 +1,9 @@
-import { OpenAIModel, OpenAIModelNames } from '@/types/openai'
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai'
 import { FC } from 'react'
 
 interface Props {
-  model: OpenAIModel
-  onSelect: (model: OpenAIModel) => void
+  model: OpenAIModelID
+  onSelect: (model: OpenAIModelID) => void
 }
 
 export const ModelSelect: FC<Props> = ({ model, onSelect }) => {
@@ -16,11 +16,11 @@ export const ModelSelect: FC<Props> = ({ model, onSelect }) => {
         className="w-[300px] p-3 dark:text-white dark:bg-[#343541] border border-neutral-500 rounded-lg appearance-none focus:shadow-outline text-neutral-900 cursor-pointer"
         placeholder="Select a model"
         value={model}
-        onChange={(e) => onSelect(e.target.value as OpenAIModel)}
+        onChange={(e) => onSelect(e.target.value as OpenAIModelID)}
       >
-        {Object.entries(OpenAIModelNames).map(([value, name]) => (
-          <option key={value} value={value}>
-            {name}
+        {Object.entries(OpenAIModels).map(([key, model]) => (
+          <option key={model.id} value={model.id}>
+            {model.name}
           </option>
         ))}
       </select>

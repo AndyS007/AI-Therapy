@@ -1,23 +1,24 @@
 import { Message } from '@/types/chat'
-import { OpenAIModel, OpenAIModelNames } from '@/types/openai'
+import { OpenAIModel, OpenAIModelID } from '@/types/openai'
 import { FC, useEffect, useRef } from 'react'
 import { ModelSelect } from '../ModelSelect'
 import { ChatInput } from './ChatInput'
 import { ChatLoader } from './ChatLoader'
 import { ChatMessage } from './ChatMessage'
+import { SESSIONS } from '@/types/prompt'
 
 interface Props {
-  model: OpenAIModel
-  stage: number | undefined
+  model: OpenAIModelID
+  session?: SESSIONS
   messages: Message[]
   loading: boolean
   onSend: (message: Message) => void
-  onSelect: (model: OpenAIModel) => void
+  onSelect: (model: OpenAIModelID) => void
 }
 
 export const Chat: FC<Props> = ({
   model,
-  stage,
+  session,
   messages,
   loading,
   onSend,
@@ -50,7 +51,7 @@ export const Chat: FC<Props> = ({
           <div className="flex-1 overflow-auto">
             <div className="text-center py-3 dark:bg-[#434654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">
               {/*Model: {OpenAIModelNames[model]}*/}
-              Stage: {stage}
+              Current Session: {session}
             </div>
 
             {messages.map((message, index) => (

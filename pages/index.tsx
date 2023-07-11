@@ -1,11 +1,17 @@
 import { useAuth } from '@/components/AuthProvider'
 import { Chat } from '@/components/Chat/Chat'
 import { Sidebar } from '@/components/Sidebar/Sidebar'
-import { Conversation, Message, defaultConversation } from '@/types/chat'
-import { OpenAIModel } from '@/types/openai'
+import {
+  Conversation,
+  Message,
+  defaultConversation,
+  ChatBody,
+} from '@/types/chat'
+import { OpenAIModelID } from '@/types/openai'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { SESSIONS } from '@/types/prompt'
 
 export default function Home() {
   const router = useRouter()
@@ -20,9 +26,10 @@ export default function Home() {
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>()
   const [loading, setLoading] = useState<boolean>(false)
-  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5_16K)
+  const [model, setModel] = useState<OpenAIModelID>(OpenAIModelID.GPT_3_5_16K)
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark')
   const [sessionEnded, setSessionEnded] = useState<boolean>(false)
+  const [currentSession, setCurrentSession] = useState<SESSIONS>(SESSIONS.START)
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -34,58 +41,6 @@ export default function Home() {
       setSelectedConversation(updatedConversation)
       setLoading(true)
 
-      // const sessionEndedRes = await fetch('/api/sessionState', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     model,
-      //     messages: updatedConversation.messages,
-      //     stage: updatedConversation.stage,
-      //   }),
-      // })
-
-      // const functionCallRes = await sessionEndedRes.json()
-      // const functionCallArgs =
-      //   functionCallRes.choices[0].message.function_call.arguments
-      // let sessionState: boolean = JSON.parse(functionCallArgs).finished
-      // console.log('sessionEnded', sessionEnded)
-      // alert('Session Ended: ' + sessionState)
-      // // setSessionEnded(sessionState)
-      // if (sessionState) {
-      //   updatedConversation = {
-      //     ...updatedConversation,
-      //     stage: updatedConversation.stage + 1,
-      //   }
-      //   setSelectedConversation(updatedConversation)
-      //   const summaryRes = await fetch('/api/summary', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       model,
-      //       messages: updatedConversation.messages,
-      //       stage: updatedConversation.stage,
-      //     }),
-      //   })
-
-      //   const summaryArgs = (await summaryRes.json()).choices[0].message
-      //     .function_call.arguments
-      //   let sessionSummary: string = JSON.parse(summaryArgs).summary
-      //   console.log('sessionSummary', sessionSummary)
-      //   alert('Session Summary: ' + sessionSummary)
-      // }
-
-      // if (sessionEnded) {
-      //   updatedConversation = {
-      //     ...updatedConversation,
-      //     sessionEnded: true,
-      //   }
-      //   setSelectedConversation(updatedConversation)
-      // }
-
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -94,7 +49,7 @@ export default function Home() {
         body: JSON.stringify({
           model,
           messages: updatedConversation.messages,
-          stage: updatedConversation.stage,
+          session: currentSession,
         }),
       })
 
@@ -173,7 +128,7 @@ export default function Home() {
         body: JSON.stringify({
           model,
           messages: updatedConversation.messages,
-          stage: updatedConversation.stage,
+          session: currentSession,
         }),
       })
 
@@ -181,13 +136,10 @@ export default function Home() {
       const functionCallArgs =
         functionCallRes.choices[0].message.function_call.arguments
       let sessionState: boolean = JSON.parse(functionCallArgs).finished
-      console.log('sessionEnded', sessionEnded)
       alert('Session Ended: ' + sessionState)
-      // setSessionEnded(sessionState)
       if (sessionState) {
         updatedConversation = {
           ...updatedConversation,
-          stage: updatedConversation.stage + 1,
         }
         setSelectedConversation(updatedConversation)
         const summaryRes = await fetch('/api/summary', {
@@ -198,8 +150,8 @@ export default function Home() {
           body: JSON.stringify({
             model,
             messages: updatedConversation.messages,
-            stage: updatedConversation.stage,
-          }),
+            session: currentSession,
+          } as ChatBody),
         })
 
         const summaryArgs = (await summaryRes.json()).choices[0].message
@@ -260,7 +212,7 @@ export default function Home() {
       JSON.stringify(newConversation),
     )
 
-    setModel(OpenAIModel.GPT_3_5_16K)
+    setModel(OpenAIModelID.GPT_3_5_16K)
     setLoading(false)
   }
 
@@ -335,7 +287,7 @@ export default function Home() {
             <Chat
               model={model}
               messages={selectedConversation.messages}
-              stage={selectedConversation.stage}
+              session={selectedConversation.session}
               loading={loading}
               onSend={handleSend}
               onSelect={setModel}
