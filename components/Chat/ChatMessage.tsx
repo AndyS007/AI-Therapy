@@ -1,5 +1,5 @@
-import { Message } from '@/types/openai'
 import { FC } from 'react'
+import { Message } from '@/types/chat'
 
 interface Props {
   message: Message
@@ -17,7 +17,7 @@ export const ChatMessage: FC<Props> = ({ message }) => {
     >
       <div className="w-[650px] flex">
         <div className="mr-4 font-bold min-w-[40px]">
-          {message.role === 'assistant' ? 'AI:' : 'You:'}
+          {message.role === 'assistant' ? 'Carol:' : 'You:'}
         </div>
 
         <div className="whitespace-pre-wrap">{message.content}</div>

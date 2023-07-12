@@ -41,6 +41,9 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit'
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`
+      textareaRef.current.style.overflow = `${
+        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+      }`
     }
   }, [content])
 
@@ -53,6 +56,12 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
           style={{
             resize: 'none',
             bottom: `${textareaRef?.current?.scrollHeight}px`,
+            maxHeight: '400px',
+            overflow: `${
+              textareaRef.current && textareaRef.current.scrollHeight > 400
+                ? 'auto'
+                : 'hidden'
+            }`,
           }}
           placeholder="Type a message..."
           value={content}

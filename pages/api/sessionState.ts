@@ -12,7 +12,7 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, prompt, session } = (await req.json()) as ChatBody
+    const { model, messages, session } = (await req.json()) as ChatBody
     let promptToSend = SYSTEM_PROMPT[session]
 
     // console.log('promptToSend', promptToSend)

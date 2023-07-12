@@ -10,10 +10,8 @@ export interface Message {
 export interface ChatBody {
   model: OpenAIModelID
   messages: Message[]
-  // key: string
   prompt?: string
   session: SESSIONS
-  // temperature: number
 }
 
 export type Role = 'assistant' | 'user'
@@ -21,19 +19,36 @@ export type Role = 'assistant' | 'user'
 export const defaultConversation = {
   id: 1,
   name: '',
-  messages: [],
-  session: SESSIONS.START,
+  messages: {
+    [SESSIONS.START]: [],
+    [SESSIONS.GOAL_SETTING]: [],
+    [SESSIONS.TREATMENT_PLAN]: [],
+    [SESSIONS.OPEN_CHAT]: [],
+  },
+  currentSession: SESSIONS.START,
   sessionEnded: false,
+  summary: {
+    [SESSIONS.START]: '',
+    [SESSIONS.GOAL_SETTING]: '',
+    [SESSIONS.TREATMENT_PLAN]: '',
+    [SESSIONS.OPEN_CHAT]: '',
+  },
 }
 
 export interface Conversation {
   id: number
   name: string
-  messages: Message[]
-  session?: SESSIONS
-  sessionEnded?: boolean
+  // messages: Message[]
+  messages: {
+    [key in SESSIONS]: Message[]
+  }
+  currentSession: SESSIONS
   model?: OpenAIModel
-  // prompt: string
+  summary: {
+    [key in SESSIONS]: string
+  }
   // temperature: number
   // folderId: string | null
 }
+
+export interface SessionSummary {}

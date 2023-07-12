@@ -11,7 +11,7 @@ import { OpenAIModelID } from '@/types/openai'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { SESSIONS } from '@/types/prompt'
+import { incrementSession, SESSIONS } from '@/types/prompt'
 
 export default function Home() {
   const router = useRouter()
@@ -28,14 +28,22 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false)
   const [model, setModel] = useState<OpenAIModelID>(OpenAIModelID.GPT_3_5_16K)
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark')
-  const [sessionEnded, setSessionEnded] = useState<boolean>(false)
-  const [currentSession, setCurrentSession] = useState<SESSIONS>(SESSIONS.START)
-
+  // const [sessionEnded, setSessionEnded] = useState<boolean>(false)
+  // const [currentSession, setCurrentSession] = useState<SESSIONS>(SESSIONS.START)
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
       let updatedConversation: Conversation = {
         ...selectedConversation,
-        messages: [...selectedConversation.messages, message],
+        // messages: [...selectedConversation.messages, message],
+        messages: {
+          ...selectedConversation.messages,
+          [selectedConversation.currentSession]: [
+            ...selectedConversation.messages[
+              selectedConversation.currentSession
+            ],
+            message,
+          ],
+        },
       }
 
       setSelectedConversation(updatedConversation)
@@ -49,7 +57,7 @@ export default function Home() {
         body: JSON.stringify({
           model,
           messages: updatedConversation.messages,
-          session: currentSession,
+          session: updatedConversation.currentSession,
         }),
       })
 
@@ -115,11 +123,6 @@ export default function Home() {
         }
       }
 
-      localStorage.setItem(
-        'selectedConversation',
-        JSON.stringify(updatedConversation),
-      )
-
       const sessionEndedRes = await fetch('/api/sessionState', {
         method: 'POST',
         headers: {
@@ -128,7 +131,7 @@ export default function Home() {
         body: JSON.stringify({
           model,
           messages: updatedConversation.messages,
-          session: currentSession,
+          session: updatedConversation.currentSession,
         }),
       })
 
@@ -138,10 +141,11 @@ export default function Home() {
       let sessionState: boolean = JSON.parse(functionCallArgs).finished
       alert('Session Ended: ' + sessionState)
       if (sessionState) {
-        updatedConversation = {
-          ...updatedConversation,
-        }
-        setSelectedConversation(updatedConversation)
+        // updatedConversation = {
+        //   ...updatedConversation,
+        // }
+        // setSelectedConversation(updatedConversation)
+        const nextSession = incrementSession(updatedConversation.currentSession)
         const summaryRes = await fetch('/api/summary', {
           method: 'POST',
           headers: {
@@ -150,16 +154,36 @@ export default function Home() {
           body: JSON.stringify({
             model,
             messages: updatedConversation.messages,
-            session: currentSession,
+            session: updatedConversation.currentSession,
           } as ChatBody),
         })
 
         const summaryArgs = (await summaryRes.json()).choices[0].message
           .function_call.arguments
-        let sessionSummary: string = JSON.parse(summaryArgs).summary
-        console.log('sessionSummary', sessionSummary)
-        alert('Session Summary: ' + sessionSummary)
+        let summary: string = JSON.parse(summaryArgs).summary
+        console.log('sessionSummary', summary)
+        alert('Session Summary: ' + summary)
+        updatedConversation = {
+          ...updatedConversation,
+          currentSession: nextSession,
+          summary: {
+            ...updatedConversation.summary,
+            [updatedConversation.currentSession]: summary,
+          },
+        }
+        setSelectedConversation(updatedConversation)
       }
+
+      console.log('session: ', selectedConversation.currentSession)
+      console.log(
+        'conversation session summary: ',
+        selectedConversation.summary,
+      )
+
+      localStorage.setItem(
+        'selectedConversation',
+        JSON.stringify(updatedConversation),
+      )
 
       const updatedConversations: Conversation[] = conversations.map(
         (conversation) => {
@@ -287,7 +311,7 @@ export default function Home() {
             <Chat
               model={model}
               messages={selectedConversation.messages}
-              session={selectedConversation.session}
+              session={selectedConversation.currentSession}
               loading={loading}
               onSend={handleSend}
               onSelect={setModel}

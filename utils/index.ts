@@ -10,12 +10,7 @@ import {
   ReconnectInterval,
 } from 'eventsource-parser'
 import { Message } from '@/types/chat'
-import {
-  FUNCTION_CALLABLE,
-  FUNCTION_TO_CALL,
-  SESSIONS,
-  SYSTEM_PROMPT,
-} from '@/types/prompt'
+import { FUNCTION_CALLABLE, FUNCTION_TO_CALL, SESSIONS } from '@/types/prompt'
 
 // @ts-ignore
 // import wasm from '@dqbd/tiktoken/lite/tiktoken_bg.wasm?module'
@@ -48,7 +43,7 @@ export const extractMessages = async (
       break
     }
     tokenCount += message.content.length
-    console.log('token count:', tokenCount)
+    // console.log('token count:', tokenCount)
     messagesToSend = [message, ...messagesToSend]
   }
 
