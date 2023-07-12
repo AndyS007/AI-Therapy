@@ -1,14 +1,21 @@
-export interface Prompt {
-  prompt: string
-  stage: number
-}
+import { Summary } from '@/types/chat'
+
 export enum FUNCTION_TO_CALL {
   SESSION_ENDED = 'enter_next_session',
   GENERATE_SUMMARY = 'generate_summary',
 }
 
-const enterNextStepFunction = {
-  name: 'enter_next_session',
+export interface FunctionCallBody {
+  name: FUNCTION_TO_CALL
+  description: string
+  parameters: {
+    type: 'object'
+    properties: object
+    required: string[]
+  }
+}
+const enterNextStepFunction: FunctionCallBody = {
+  name: FUNCTION_TO_CALL.SESSION_ENDED,
   description:
     'Based on the therapy conversation to determine whether the current therapy session is finished',
   parameters: {
@@ -23,8 +30,8 @@ const enterNextStepFunction = {
   },
 }
 
-const generateSummaryFunction = {
-  name: 'generate_summary',
+const generateSummaryFunction: FunctionCallBody = {
+  name: FUNCTION_TO_CALL.GENERATE_SUMMARY,
   description:
     'Based on the therapy conversation to generate a summary of the therapy session according to the Problem Statement Example',
   parameters: {
@@ -44,8 +51,8 @@ export const FUNCTION_CALLABLE: Record<FUNCTION_TO_CALL, object> = {
   [FUNCTION_TO_CALL.GENERATE_SUMMARY]: generateSummaryFunction,
 }
 
-export const DEFAULT_SYSTEM_PROMPT =
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."
+const lastStagePrompt: string =
+  'You are Carol, an AI grief therapist. You are having your session with me who is deeply saddened by the loss of my pet. Help me process my grief. Help me to move on.  Identify whether I have a problem adapting to the loss and symptoms of depression.'
 
 const firstStagePrompt: string = `
 #Instruction
@@ -95,14 +102,8 @@ Hello, I think today the focus will really be getting into some of the coping st
 10. Ask me if I understand the goal first, and then make suggestions.
 `
 
-// export enum SESSIONS {
-//   START,
-//   GOAL_SETTING,
-//   TREATMENT_PLAN,
-//   OPEN_CHAT,
-// }
 export enum SESSIONS {
-  START = 'Start',
+  PROBLEM_DIAGNOSIS = 'Problem Diagnosis',
   GOAL_SETTING = 'Goal Setting',
   TREATMENT_PLAN = 'Treatment Plan',
   OPEN_CHAT = 'Open Chat',
@@ -127,8 +128,20 @@ export function decrementSession(currentSession: SESSIONS): SESSIONS {
   return currentSession // Return first session if the current session is invalid or the first session itself
 }
 export const SYSTEM_PROMPT: Record<SESSIONS, string> = {
-  [SESSIONS.START]: firstStagePrompt,
+  [SESSIONS.PROBLEM_DIAGNOSIS]: firstStagePrompt,
   [SESSIONS.GOAL_SETTING]: secondStagePrompt,
   [SESSIONS.TREATMENT_PLAN]: thirdStagePrompt,
-  [SESSIONS.OPEN_CHAT]: DEFAULT_SYSTEM_PROMPT,
+  [SESSIONS.OPEN_CHAT]: lastStagePrompt,
+}
+export function summaryGenerator(summary: Summary): string {
+  let result =
+    summary[Object.values(SESSIONS)[0]] === ''
+      ? ''
+      : '\n#Summary from previous sessions:\n'
+  for (const session of Object.values(SESSIONS)) {
+    if (summary[session] === '') break
+    let sessionSummary = summary[session]
+    result += `Session: ${session}\n ${sessionSummary}\n`
+  }
+  return result
 }

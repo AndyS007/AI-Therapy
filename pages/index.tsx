@@ -57,6 +57,7 @@ export default function Home() {
           messages:
             updatedConversation.messages[updatedConversation.currentSession],
           session: updatedConversation.currentSession,
+          summary: updatedConversation.summary,
         } as ChatBody),
       })
 
@@ -143,6 +144,7 @@ export default function Home() {
           messages:
             updatedConversation.messages[updatedConversation.currentSession],
           session: updatedConversation.currentSession,
+          summary: updatedConversation.summary,
         } as ChatBody),
       })
 
@@ -167,6 +169,7 @@ export default function Home() {
             messages:
               updatedConversation.messages[updatedConversation.currentSession],
             session: updatedConversation.currentSession,
+            summary: updatedConversation.summary,
           } as ChatBody),
         })
 

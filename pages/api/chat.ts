@@ -1,6 +1,6 @@
 import { extractMessages, OpenAIStream } from '@/utils'
 import { ChatBody } from '@/types/chat'
-import { DEFAULT_SYSTEM_PROMPT, SYSTEM_PROMPT } from '@/types/prompt'
+import { summaryGenerator, SYSTEM_PROMPT } from '@/types/prompt'
 
 export const config = {
   runtime: 'edge',
@@ -8,16 +8,16 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, session } = (await req.json()) as ChatBody
-    let promptToSend = SYSTEM_PROMPT[session]
-    // console.log(messages)
+    const data = (await req.json()) as ChatBody
+    // console.log(data)
+    const { model, messages, session, summary } = data
 
-    let messagesToSend = await extractMessages(
-      messages,
-      model,
-      session,
-      promptToSend,
-    )
+    let summaryToSend = summaryGenerator(summary)
+
+    let promptToSend = SYSTEM_PROMPT[session] + summaryToSend
+    // console.log(promptToSend)
+
+    let messagesToSend = await extractMessages(messages, model, session)
 
     const stream = await OpenAIStream(model, messagesToSend, promptToSend)
 

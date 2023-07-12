@@ -23,10 +23,10 @@ import { FUNCTION_CALLABLE, FUNCTION_TO_CALL, SESSIONS } from '@/types/prompt'
 //   tiktokenModel.pat_str,
 // )
 
+// TODO: Use tiktoken
 export const extractMessages = async (
   messages: Message[],
   model: OpenAIModelID,
-  session: SESSIONS,
   systemPrompt: string,
 ) => {
   // await init((imports) => WebAssembly.instantiate(wasm, imports))

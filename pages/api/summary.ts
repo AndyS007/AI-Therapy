@@ -1,22 +1,22 @@
 import { extractMessages, functionCallResponse, OpenAIStream } from '@/utils'
 import { ChatBody } from '@/types/chat'
-import { FUNCTION_TO_CALL, SYSTEM_PROMPT } from '@/types/prompt'
+import {
+  FUNCTION_TO_CALL,
+  summaryGenerator,
+  SYSTEM_PROMPT,
+} from '@/types/prompt'
 
 export const config = {
   runtime: 'edge',
 }
 
-const handler = async (req: Request): Promise<Response> => {
+const handler = async (req: Request) => {
   try {
-    const { model, messages, session } = (await req.json()) as ChatBody
-    let promptToSend = SYSTEM_PROMPT[session]
+    const { model, messages, session, summary } = (await req.json()) as ChatBody
+    let summaryToSend = summaryGenerator(summary)
+    let promptToSend = SYSTEM_PROMPT[session] + summaryToSend
 
-    let messagesToSend = await extractMessages(
-      messages,
-      model,
-      session,
-      promptToSend,
-    )
+    let messagesToSend = await extractMessages(messages, model, session)
 
     const res = await functionCallResponse(
       model,

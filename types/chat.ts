@@ -4,7 +4,6 @@ import { SESSIONS } from '@/types/prompt'
 export interface Message {
   role: Role
   content: string
-  session?: SESSIONS
 }
 
 export interface ChatBody {
@@ -12,44 +11,42 @@ export interface ChatBody {
   messages: Message[]
   prompt?: string
   session: SESSIONS
+  summary: Summary
 }
 
 export type Role = 'assistant' | 'user'
 
-const defaultSummary = {
-  [SESSIONS.START]: '',
+const defaultSummary: Summary = {
+  [SESSIONS.PROBLEM_DIAGNOSIS]: '',
   [SESSIONS.GOAL_SETTING]: '',
   [SESSIONS.TREATMENT_PLAN]: '',
   [SESSIONS.OPEN_CHAT]: '',
+}
+export type Summary = {
+  [key in SESSIONS]: string
+}
+export type sessionMessages = {
+  [key in SESSIONS]: Message[]
 }
 
 export const defaultConversation = {
   id: 1,
   name: '',
   messages: {
-    [SESSIONS.START]: [],
+    [SESSIONS.PROBLEM_DIAGNOSIS]: [],
     [SESSIONS.GOAL_SETTING]: [],
     [SESSIONS.TREATMENT_PLAN]: [],
     [SESSIONS.OPEN_CHAT]: [],
   },
-  currentSession: SESSIONS.START,
+  currentSession: SESSIONS.PROBLEM_DIAGNOSIS,
   summary: defaultSummary,
 }
 
 export interface Conversation {
   id: number
   name: string
-  // messages: Message[]
-  messages: {
-    [key in SESSIONS]: Message[]
-  }
+  messages: sessionMessages
   currentSession: SESSIONS
   model?: OpenAIModel
-  summary: {
-    [key in SESSIONS]: string
-  }
-  // temperature: number
-  // folderId: string | null
+  summary: Summary
 }
-
-export interface SessionSummary {}

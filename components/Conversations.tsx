@@ -28,8 +28,8 @@ export const Conversations: FC<Props> = ({
         >
           <IconMessage className="mr-2 min-w-[20px]" size={18} />
           <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1">
-            {conversation.messages[SESSIONS.START][0]
-              ? conversation.messages[SESSIONS.START][0].content
+            {conversation.messages[SESSIONS.PROBLEM_DIAGNOSIS][0]
+              ? conversation.messages[SESSIONS.PROBLEM_DIAGNOSIS][0].content
               : 'Empty conversation'}
           </div>
 

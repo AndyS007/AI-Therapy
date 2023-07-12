@@ -16,7 +16,7 @@ export const ChatMessage: FC<Props> = ({ message }) => {
       style={{ overflowWrap: 'anywhere' }}
     >
       <div className="w-[650px] flex">
-        <div className="mr-4 font-bold min-w-[40px]">
+        <div className="mr-4 font-bold min-w-[60px]">
           {message.role === 'assistant' ? 'Carol:' : 'You:'}
         </div>
 

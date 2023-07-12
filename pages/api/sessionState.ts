@@ -1,7 +1,7 @@
 import { ChatBody } from '@/types/chat'
 import {
-  DEFAULT_SYSTEM_PROMPT,
   FUNCTION_TO_CALL,
+  summaryGenerator,
   SYSTEM_PROMPT,
 } from '@/types/prompt'
 import { functionCallResponse, extractMessages } from '@/utils'
@@ -12,16 +12,12 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, session } = (await req.json()) as ChatBody
-    let promptToSend = SYSTEM_PROMPT[session]
+    const { model, messages, session, summary } = (await req.json()) as ChatBody
+    let summaryToSend = summaryGenerator(summary)
+    let promptToSend = SYSTEM_PROMPT[session] + summaryToSend
 
     // console.log('promptToSend', promptToSend)
-    let messagesToSend = await extractMessages(
-      messages,
-      model,
-      session,
-      promptToSend,
-    )
+    let messagesToSend = await extractMessages(messages, model, session)
 
     const res = await functionCallResponse(
       model,
