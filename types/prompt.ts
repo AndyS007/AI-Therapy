@@ -118,6 +118,14 @@ export function incrementSession(currentSession: SESSIONS): SESSIONS {
   }
   return currentSession // Return last session if the current session is invalid or the last session itself
 }
+
+export function decrementSession(currentSession: SESSIONS): SESSIONS {
+  const sessionIndex = Object.values(SESSIONS).indexOf(currentSession)
+  if (sessionIndex !== -1 && sessionIndex > 0) {
+    return Object.values(SESSIONS)[sessionIndex - 1]
+  }
+  return currentSession // Return first session if the current session is invalid or the first session itself
+}
 export const SYSTEM_PROMPT: Record<SESSIONS, string> = {
   [SESSIONS.START]: firstStagePrompt,
   [SESSIONS.GOAL_SETTING]: secondStagePrompt,

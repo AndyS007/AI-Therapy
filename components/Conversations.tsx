@@ -1,6 +1,7 @@
 import { Conversation } from '@/types/chat'
 import { IconMessage, IconTrash } from '@tabler/icons-react'
 import { FC } from 'react'
+import { SESSIONS } from '@/types/prompt'
 
 interface Props {
   conversations: Conversation[]
@@ -27,8 +28,8 @@ export const Conversations: FC<Props> = ({
         >
           <IconMessage className="mr-2 min-w-[20px]" size={18} />
           <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1">
-            {conversation.messages[0]
-              ? conversation.messages[0].content
+            {conversation.messages[SESSIONS.START][0]
+              ? conversation.messages[SESSIONS.START][0].content
               : 'Empty conversation'}
           </div>
 

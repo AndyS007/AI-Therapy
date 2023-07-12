@@ -16,6 +16,13 @@ export interface ChatBody {
 
 export type Role = 'assistant' | 'user'
 
+const defaultSummary = {
+  [SESSIONS.START]: '',
+  [SESSIONS.GOAL_SETTING]: '',
+  [SESSIONS.TREATMENT_PLAN]: '',
+  [SESSIONS.OPEN_CHAT]: '',
+}
+
 export const defaultConversation = {
   id: 1,
   name: '',
@@ -26,13 +33,7 @@ export const defaultConversation = {
     [SESSIONS.OPEN_CHAT]: [],
   },
   currentSession: SESSIONS.START,
-  sessionEnded: false,
-  summary: {
-    [SESSIONS.START]: '',
-    [SESSIONS.GOAL_SETTING]: '',
-    [SESSIONS.TREATMENT_PLAN]: '',
-    [SESSIONS.OPEN_CHAT]: '',
-  },
+  summary: defaultSummary,
 }
 
 export interface Conversation {

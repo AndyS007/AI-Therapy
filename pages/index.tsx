@@ -28,8 +28,6 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false)
   const [model, setModel] = useState<OpenAIModelID>(OpenAIModelID.GPT_3_5_16K)
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark')
-  // const [sessionEnded, setSessionEnded] = useState<boolean>(false)
-  // const [currentSession, setCurrentSession] = useState<SESSIONS>(SESSIONS.START)
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
       let updatedConversation: Conversation = {
@@ -56,9 +54,10 @@ export default function Home() {
         },
         body: JSON.stringify({
           model,
-          messages: updatedConversation.messages,
+          messages:
+            updatedConversation.messages[updatedConversation.currentSession],
           session: updatedConversation.currentSession,
-        }),
+        } as ChatBody),
       })
 
       if (!response.ok) {
@@ -90,33 +89,44 @@ export default function Home() {
         if (isFirst) {
           isFirst = false
           const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
+            ...updatedConversation.messages[updatedConversation.currentSession],
             { role: 'assistant', content: chunkValue },
           ]
 
           updatedConversation = {
             ...updatedConversation,
-            messages: updatedMessages,
+            messages: {
+              ...selectedConversation.messages,
+              [selectedConversation.currentSession]: updatedMessages,
+            },
           }
 
           setSelectedConversation(updatedConversation)
         } else {
-          const updatedMessages: Message[] = updatedConversation.messages.map(
-            (message, index) => {
-              if (index === updatedConversation.messages.length - 1) {
-                return {
-                  ...message,
-                  content: text,
-                }
+          const updatedMessages: Message[] = updatedConversation.messages[
+            updatedConversation.currentSession
+          ].map((message, index) => {
+            if (
+              index ===
+              updatedConversation.messages[updatedConversation.currentSession]
+                .length -
+                1
+            ) {
+              return {
+                ...message,
+                content: text,
               }
+            }
 
-              return message
-            },
-          )
+            return message
+          })
 
           updatedConversation = {
             ...updatedConversation,
-            messages: updatedMessages,
+            messages: {
+              ...selectedConversation.messages,
+              [selectedConversation.currentSession]: updatedMessages,
+            },
           }
 
           setSelectedConversation(updatedConversation)
@@ -130,9 +140,10 @@ export default function Home() {
         },
         body: JSON.stringify({
           model,
-          messages: updatedConversation.messages,
+          messages:
+            updatedConversation.messages[updatedConversation.currentSession],
           session: updatedConversation.currentSession,
-        }),
+        } as ChatBody),
       })
 
       const functionCallRes = await sessionEndedRes.json()
@@ -153,7 +164,8 @@ export default function Home() {
           },
           body: JSON.stringify({
             model,
-            messages: updatedConversation.messages,
+            messages:
+              updatedConversation.messages[updatedConversation.currentSession],
             session: updatedConversation.currentSession,
           } as ChatBody),
         })
@@ -310,7 +322,13 @@ export default function Home() {
           <div className="flex flex-col w-full h-full dark:bg-[#343541]">
             <Chat
               model={model}
-              messages={selectedConversation.messages}
+              // the whole conversation history
+              messages={Object.values(selectedConversation.messages).reduce(
+                (accumulator, currentValue) => {
+                  return accumulator.concat(currentValue)
+                },
+                [],
+              )}
               session={selectedConversation.currentSession}
               loading={loading}
               onSend={handleSend}
