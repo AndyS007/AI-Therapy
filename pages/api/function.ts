@@ -8,9 +8,6 @@ import {
   SYSTEM_PROMPT,
 } from '@/types/prompt'
 import { functionCallResponse, extractMessages } from '@/utils'
-import { func } from 'prop-types'
-
-const name = '/api/function'
 
 export const config = {
   runtime: 'edge',
@@ -31,29 +28,51 @@ const handler = async (req: Request): Promise<Response> => {
     let messagesToSend = await extractMessages(messages, model, promptToSend)
     // console.log(name, ': messagesToSend', messagesToSend)
 
-    const rawSessionEndedRes = await functionCallResponse(
+    const sessionEndedPromise = functionCallResponse(
       model,
       messagesToSend,
       promptToSend,
       FUNCTION_TO_CALL.SESSION_ENDED,
     )
-    const { sessionEnded } =
-      (await rawSessionEndedRes.json()) as sessionEndedResponse
-    let newSummary = ''
+    const summaryPromise = functionCallResponse(
+      model,
+      messagesToSend,
+      promptToSend,
+      FUNCTION_TO_CALL.GENERATE_SUMMARY,
+    )
+    const raceResult = (await (
+      await Promise.race([sessionEndedPromise, summaryPromise])
+    ).json()) as functionCallResponseType
+    console.log('raceResult', raceResult)
 
-    if (sessionEnded) {
-      // generate summary if session ended
-      const rawSummaryRes = await functionCallResponse(
-        model,
-        messagesToSend,
-        promptToSend,
-        FUNCTION_TO_CALL.GENERATE_SUMMARY,
+    if ('sessionEnded' in raceResult) {
+      console.log('session promise won')
+      if (!raceResult.sessionEnded) {
+        console.log('session not ended')
+        return new Response(
+          JSON.stringify({ sessionEnded: false, summary: '' }),
+        )
+      } else {
+        console.log('session ended, waiting for summary')
+        const { summary } = (await (
+          await summaryPromise
+        ).json()) as summaryResponse
+        return new Response(JSON.stringify({ sessionEnded: true, summary }))
+      }
+    } else {
+      console.log('summary promise won, check if session ended')
+      const { sessionEnded } = (await (
+        await sessionEndedPromise
+      ).json()) as sessionEndedResponse
+
+      console.log('sessionEnded', sessionEnded)
+      return new Response(
+        JSON.stringify({
+          sessionEnded,
+          summary: sessionEnded ? raceResult.summary : '',
+        }),
       )
-      const { summary } = (await rawSummaryRes.json()) as summaryResponse
-      newSummary = summary
     }
-
-    return new Response(JSON.stringify({ sessionEnded, summary: newSummary }))
   } catch (error) {
     console.error(error)
     return new Response('Error', { status: 500 })
