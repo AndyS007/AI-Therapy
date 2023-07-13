@@ -14,33 +14,48 @@ export interface FunctionCallBody {
     required: string[]
   }
 }
+export interface sessionEndedResponse {
+  sessionEnded: boolean
+}
+
+export interface summaryResponse {
+  summary: string
+}
+
+export type functionCallResponseType = sessionEndedResponse | summaryResponse
+
+// export interface functionCallResponseInterface {
+//   sessionEnded?: boolean
+//   summary?: string
+// }
 const enterNextStepFunction: FunctionCallBody = {
   name: FUNCTION_TO_CALL.SESSION_ENDED,
   description:
-    'Based on the therapy conversation to determine whether the current therapy session is finished',
+    'Based on the therapy conversation to determine whether the current therapy session is finished and enter the next therapy session',
   parameters: {
     type: 'object',
     properties: {
-      finished: {
+      sessionEnded: {
         type: 'boolean',
         description: 'Whether the current therapy session is finished',
       },
     },
-    required: ['finished'],
+    required: ['sessionEnded'],
   },
 }
 
 const generateSummaryFunction: FunctionCallBody = {
   name: FUNCTION_TO_CALL.GENERATE_SUMMARY,
   description:
-    'Based on the therapy conversation to generate a summary of the therapy session according to the Problem Statement Example',
+    'Based on the therapy conversation to generate a summary of the therapy session',
+  // 'Based on the therapy conversation to generate a summary of the therapy session according to the Problem Statement Example',
   parameters: {
     type: 'object',
     properties: {
       summary: {
         type: 'string',
-        description:
-          'The summary of the therapy session according to the Problem Statement Example',
+        description: 'The summary of the therapy session',
+        // 'The summary of the therapy session according to the Problem Statement Example',
       },
     },
     required: ['summary'],

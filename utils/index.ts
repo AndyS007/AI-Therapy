@@ -10,7 +10,12 @@ import {
   ReconnectInterval,
 } from 'eventsource-parser'
 import { Message } from '@/types/chat'
-import { FUNCTION_CALLABLE, FUNCTION_TO_CALL, SESSIONS } from '@/types/prompt'
+import {
+  FUNCTION_CALLABLE,
+  FUNCTION_TO_CALL,
+  functionCallResponseType,
+  SESSIONS,
+} from '@/types/prompt'
 
 // @ts-ignore
 import wasm from '@dqbd/tiktoken/lite/tiktoken_bg.wasm?module'
@@ -145,6 +150,9 @@ export const functionCallResponse = async (
   if (res.status !== 200) {
     throw new Error('OpenAI API returned an error')
   }
-
-  return res
+  const functionCallRes = await res.json()
+  const functionCallArgs = JSON.parse(
+    functionCallRes.choices[0].message.function_call.arguments,
+  ) as functionCallResponseType
+  return new Response(JSON.stringify(functionCallArgs))
 }

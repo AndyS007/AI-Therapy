@@ -11,7 +11,11 @@ import { OpenAIModelID } from '@/types/openai'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { incrementSession, SESSIONS } from '@/types/prompt'
+import {
+  functionCallResponseType,
+  incrementSession,
+  SESSIONS,
+} from '@/types/prompt'
 
 export default function Home() {
   const router = useRouter()
@@ -134,7 +138,7 @@ export default function Home() {
         }
       }
 
-      const sessionEndedRes = await fetch('/api/sessionState', {
+      const functionCallRes = await fetch('/api/function', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,35 +152,11 @@ export default function Home() {
         } as ChatBody),
       })
 
-      const functionCallRes = await sessionEndedRes.json()
-      const functionCallArgs =
-        functionCallRes.choices[0].message.function_call.arguments
-      let sessionState: boolean = JSON.parse(functionCallArgs).finished
-      alert('Session Ended: ' + sessionState)
-      if (sessionState) {
-        // updatedConversation = {
-        //   ...updatedConversation,
-        // }
-        // setSelectedConversation(updatedConversation)
+      const { sessionEnded, summary } = await functionCallRes.json()
+      console.log('sessionEnded: ', sessionEnded)
+      alert('Session Ended: ' + sessionEnded)
+      if (sessionEnded) {
         const nextSession = incrementSession(updatedConversation.currentSession)
-        const summaryRes = await fetch('/api/summary', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model,
-            messages:
-              updatedConversation.messages[updatedConversation.currentSession],
-            session: updatedConversation.currentSession,
-            summary: updatedConversation.summary,
-          } as ChatBody),
-        })
-
-        const summaryArgs = (await summaryRes.json()).choices[0].message
-          .function_call.arguments
-        let summary: string = JSON.parse(summaryArgs).summary
-        console.log('sessionSummary', summary)
         alert('Session Summary: ' + summary)
         updatedConversation = {
           ...updatedConversation,
@@ -188,12 +168,6 @@ export default function Home() {
         }
         setSelectedConversation(updatedConversation)
       }
-
-      console.log('session: ', selectedConversation.currentSession)
-      console.log(
-        'conversation session summary: ',
-        selectedConversation.summary,
-      )
 
       localStorage.setItem(
         'selectedConversation',
@@ -230,10 +204,6 @@ export default function Home() {
 
   const handleNewConversation = () => {
     const newConversation: Conversation = {
-      // id: conversations.length + 1,
-      // name: '',
-      // messages: [],
-      // stage: 1,
       ...defaultConversation,
       id: conversations.length + 1,
     }
