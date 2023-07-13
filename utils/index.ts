@@ -13,15 +13,10 @@ import { Message } from '@/types/chat'
 import { FUNCTION_CALLABLE, FUNCTION_TO_CALL, SESSIONS } from '@/types/prompt'
 
 // @ts-ignore
-// import wasm from '@dqbd/tiktoken/lite/tiktoken_bg.wasm?module'
-//
-// import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json'
-// import { Tiktoken, init } from '@dqbd/tiktoken/lite/init'
-// const encoding = new Tiktoken(
-//   tiktokenModel.bpe_ranks,
-//   tiktokenModel.special_tokens,
-//   tiktokenModel.pat_str,
-// )
+import wasm from '@dqbd/tiktoken/lite/tiktoken_bg.wasm?module'
+
+import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json'
+import { Tiktoken, init } from '@dqbd/tiktoken/lite/init'
 
 // TODO: Use tiktoken
 export const extractMessages = async (
@@ -29,7 +24,12 @@ export const extractMessages = async (
   model: OpenAIModelID,
   systemPrompt: string,
 ) => {
-  // await init((imports) => WebAssembly.instantiate(wasm, imports))
+  await init((imports) => WebAssembly.instantiate(wasm, imports))
+  const encoding = new Tiktoken(
+    tiktokenModel.bpe_ranks,
+    tiktokenModel.special_tokens,
+    tiktokenModel.pat_str,
+  )
   let tokenLimit = OpenAIModels[model].tokenLimit
   let messagesToSend: Message[] = []
   // let tokenCount = encoding.encode(systemPrompt).length

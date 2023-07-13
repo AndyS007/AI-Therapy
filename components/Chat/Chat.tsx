@@ -48,8 +48,8 @@ export const Chat: FC<Props> = ({
         </>
       ) : (
         <>
-          <div className="flex-1 overflow-auto">
-            <div className="text-center py-3 dark:bg-[#434654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">
+          <div className="flex-1 overflow-auto ">
+            <div className="sticky  top-0  flex justify-center bg-neutral-100   py-3 dark:bg-[#434654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">
               {/*Model: {OpenAIModelNames[model]}*/}
               Current Session: {session}
             </div>

@@ -10,7 +10,7 @@ export const ChatLoader: FC<Props> = () => {
       style={{ overflowWrap: 'anywhere' }}
     >
       <div className="w-[650px] flex">
-        <div className="mr-4 font-bold min-w-[30px]">AI:</div>
+        <div className="mr-4 font-bold min-w-[50px]">Carol:</div>
         <IconDots className="animate-pulse" />
       </div>
     </div>
