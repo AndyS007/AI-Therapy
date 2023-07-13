@@ -6,6 +6,8 @@ import {
 } from '@/types/prompt'
 import { functionCallResponse, extractMessages } from '@/utils'
 
+const name = '/api/sessionState'
+
 export const config = {
   runtime: 'edge',
 }
@@ -17,7 +19,8 @@ const handler = async (req: Request): Promise<Response> => {
     let promptToSend = SYSTEM_PROMPT[session] + summaryToSend
 
     // console.log('promptToSend', promptToSend)
-    let messagesToSend = await extractMessages(messages, model, session)
+    let messagesToSend = await extractMessages(messages, model, promptToSend)
+    console.log(name, ': messagesToSend', messagesToSend)
 
     const res = await functionCallResponse(
       model,

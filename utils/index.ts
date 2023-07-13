@@ -18,7 +18,6 @@ import wasm from '@dqbd/tiktoken/lite/tiktoken_bg.wasm?module'
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json'
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init'
 
-// TODO: Use tiktoken
 export const extractMessages = async (
   messages: Message[],
   model: OpenAIModelID,
@@ -32,18 +31,16 @@ export const extractMessages = async (
   )
   let tokenLimit = OpenAIModels[model].tokenLimit
   let messagesToSend: Message[] = []
-  // let tokenCount = encoding.encode(systemPrompt).length
-  let tokenCount = systemPrompt.length
+  let tokenCount = encoding.encode(systemPrompt).length
 
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i]
-    // const tokens = encoding.encode(message.content)
+    const tokens = encoding.encode(message.content)
 
-    if (tokenCount + message.content.length > tokenLimit) {
+    if (tokenCount + tokens.length > tokenLimit) {
       break
     }
-    tokenCount += message.content.length
-    // console.log('token count:', tokenCount)
+    tokenCount += tokens.length
     messagesToSend = [message, ...messagesToSend]
   }
 
@@ -149,6 +146,5 @@ export const functionCallResponse = async (
     throw new Error('OpenAI API returned an error')
   }
 
-  // const data = await res.json()
   return res
 }

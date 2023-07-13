@@ -16,7 +16,7 @@ const handler = async (req: Request) => {
     let summaryToSend = summaryGenerator(summary)
     let promptToSend = SYSTEM_PROMPT[session] + summaryToSend
 
-    let messagesToSend = await extractMessages(messages, model, session)
+    let messagesToSend = await extractMessages(messages, model, promptToSend)
 
     const res = await functionCallResponse(
       model,

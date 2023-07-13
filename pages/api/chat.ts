@@ -15,10 +15,8 @@ const handler = async (req: Request): Promise<Response> => {
     let summaryToSend = summaryGenerator(summary)
 
     let promptToSend = SYSTEM_PROMPT[session] + summaryToSend
-    console.log(promptToSend)
 
-    let messagesToSend = await extractMessages(messages, model, session)
-    // console.log(messagesToSend)
+    let messagesToSend = await extractMessages(messages, model, promptToSend)
 
     const stream = await OpenAIStream(model, messagesToSend, promptToSend)
 
