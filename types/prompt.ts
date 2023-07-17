@@ -1,4 +1,4 @@
-import { Summary } from '@/types/chat'
+import { Message, Summary } from '@/types/chat'
 
 export enum FUNCTION_TO_CALL {
   SESSION_ENDED = 'enter_next_session',
@@ -64,6 +64,10 @@ const generateSummaryFunction: FunctionCallBody = {
 export const FUNCTION_CALLABLE: Record<FUNCTION_TO_CALL, object> = {
   [FUNCTION_TO_CALL.SESSION_ENDED]: enterNextStepFunction,
   [FUNCTION_TO_CALL.GENERATE_SUMMARY]: generateSummaryFunction,
+}
+export const greetingMessage: Message = {
+  role: 'assistant',
+  content: `Hi, welcome to your first counselling session. I'm Carol, an AI grief therapist. I'm here to listen and provide support. Can you tell me a little bit more about what brings you here today?`,
 }
 
 const lastStagePrompt: string =

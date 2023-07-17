@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // console.log('promptToSend', promptToSend)
     let messagesToSend = await extractMessages(messages, model, promptToSend)
-    // console.log(name, ': messagesToSend', messagesToSend)
+    // console.log('messagesToSend', messagesToSend)
 
     const sessionEndedPromise = functionCallResponse(
       model,
@@ -43,29 +43,30 @@ const handler = async (req: Request): Promise<Response> => {
     const raceResult = (await (
       await Promise.race([sessionEndedPromise, summaryPromise])
     ).json()) as functionCallResponseType
-    console.log('raceResult', raceResult)
+    // console.log('raceResult', raceResult)
 
     if ('sessionEnded' in raceResult) {
-      console.log('session promise won')
+      // console.log('session promise won')
       if (!raceResult.sessionEnded) {
-        console.log('session not ended')
+        // console.log('session not ended')
         return new Response(
           JSON.stringify({ sessionEnded: false, summary: '' }),
         )
       } else {
-        console.log('session ended, waiting for summary')
+        // console.log('session ended, waiting for summary')
         const { summary } = (await (
           await summaryPromise
         ).json()) as summaryResponse
+        // console.log('summary', summary)
         return new Response(JSON.stringify({ sessionEnded: true, summary }))
       }
     } else {
-      console.log('summary promise won, check if session ended')
+      // console.log('summary promise won, check if session ended')
       const { sessionEnded } = (await (
         await sessionEndedPromise
       ).json()) as sessionEndedResponse
 
-      console.log('sessionEnded', sessionEnded)
+      // console.log('sessionEnded', sessionEnded)
       return new Response(
         JSON.stringify({
           sessionEnded,

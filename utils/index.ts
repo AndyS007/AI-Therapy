@@ -1,9 +1,4 @@
-import {
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
-  RESPONSE_TOKEN_LIMIT,
-} from '@/types/openai'
+import { OpenAIModelID, OpenAIModels } from '@/types/openai'
 import {
   createParser,
   ParsedEvent,
@@ -48,6 +43,8 @@ export const extractMessages = async (
     tokenCount += tokens.length
     messagesToSend = [message, ...messagesToSend]
   }
+  console.log('Final token count: ', tokenCount)
+  // encoding.free()
 
   return messagesToSend
 }
@@ -151,6 +148,7 @@ export const functionCallResponse = async (
     throw new Error('OpenAI API returned an error')
   }
   const functionCallRes = await res.json()
+  // console.log('functionCallRes usage', functionCallRes.usage)
   const functionCallArgs = JSON.parse(
     functionCallRes.choices[0].message.function_call.arguments,
   ) as functionCallResponseType

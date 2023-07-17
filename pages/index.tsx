@@ -154,6 +154,7 @@ export default function Home() {
 
       const { sessionEnded, summary } = await functionCallRes.json()
       console.log('sessionEnded: ', sessionEnded)
+      console.log('summary: ', summary)
       alert('Session Ended: ' + sessionEnded)
       if (sessionEnded) {
         const nextSession = incrementSession(updatedConversation.currentSession)

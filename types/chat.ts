@@ -1,5 +1,5 @@
 import { OpenAIModel, OpenAIModelID } from '@/types/openai'
-import { SESSIONS } from '@/types/prompt'
+import { greetingMessage, SESSIONS } from '@/types/prompt'
 
 export interface Message {
   role: Role
@@ -33,7 +33,7 @@ export const defaultConversation = {
   id: 1,
   name: '',
   messages: {
-    [SESSIONS.PROBLEM_DIAGNOSIS]: [],
+    [SESSIONS.PROBLEM_DIAGNOSIS]: [greetingMessage],
     [SESSIONS.GOAL_SETTING]: [],
     [SESSIONS.TREATMENT_PLAN]: [],
     [SESSIONS.OPEN_CHAT]: [],

@@ -1,5 +1,5 @@
 import { Message } from '@/types/chat'
-import { OpenAIModel, OpenAIModelID } from '@/types/openai'
+import { OpenAIModelID } from '@/types/openai'
 import { FC, useEffect, useRef } from 'react'
 import { ModelSelect } from '../ModelSelect'
 import { ChatInput } from './ChatInput'
