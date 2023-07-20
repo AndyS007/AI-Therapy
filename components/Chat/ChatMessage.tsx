@@ -8,7 +8,7 @@ interface Props {
 export const ChatMessage: FC<Props> = ({ message }) => {
   return (
     <div
-      className={`flex justify-center px-[120px] py-[30px] whitespace-pre-wrap] ${
+      className={`flex justify-center px-[30px] py-[30px] whitespace-pre-wrap] ${
         message.role === 'assistant'
           ? 'dark:bg-[#434654] dark:text-neutral-100 bg-neutral-100 text-neutral-900 border border-neutral-300 dark:border-none'
           : 'dark:bg-[#343541] dark:text-white text-neutral-900'
