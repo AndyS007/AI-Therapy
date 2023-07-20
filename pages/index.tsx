@@ -327,14 +327,11 @@ export default function Home() {
       if (docSnap.exists()) {
         selectedConversation = docSnap.data() as Conversation
         console.log('Document data:', docSnap.data())
-        if (selectedConversation) {
-          setSelectedConversation(selectedConversation)
-        } else {
-          setSelectedConversation(defaultConversation)
-        }
+        setSelectedConversation(selectedConversation)
       } else {
         // doc.data() will be undefined in this case
-        console.log('No such document!')
+        console.log('No document found! Creating new conversation')
+        setSelectedConversation(defaultConversation)
       }
     })
   }, [currentUser])
