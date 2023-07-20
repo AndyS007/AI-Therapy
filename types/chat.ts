@@ -33,7 +33,7 @@ export const defaultConversation = {
   id: 1,
   name: '',
   messages: {
-    [SESSIONS.PROBLEM_DIAGNOSIS]: [greetingMessage],
+    [SESSIONS.PROBLEM_DIAGNOSIS]: [],
     [SESSIONS.GOAL_SETTING]: [],
     [SESSIONS.TREATMENT_PLAN]: [],
     [SESSIONS.OPEN_CHAT]: [],

@@ -12,7 +12,7 @@ import {
 import { OpenAIModelID } from '@/types/openai'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { greetingMessage, incrementSession, SESSIONS } from '@/types/prompt'
 import { db } from '@lib/firebase'
 
@@ -32,164 +32,174 @@ export default function Home() {
   const [model, setModel] = useState<OpenAIModelID>(OpenAIModelID.GPT_3_5_16K)
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark')
   const [showSidebar, setShowSidebar] = useState<boolean>(true)
-  const handleSend = async (message: Message) => {
-    if (selectedConversation) {
-      let updatedConversation: Conversation = {
-        ...selectedConversation,
-        // messages: [...selectedConversation.messages, message],
-        messages: {
-          ...selectedConversation.messages,
-          [selectedConversation.currentSession]: [
-            ...selectedConversation.messages[
-              selectedConversation.currentSession
-            ],
-            message,
-          ],
-        },
-      }
-
-      setSelectedConversation(updatedConversation)
-      setLoading(true)
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model,
-          messages:
-            updatedConversation.messages[updatedConversation.currentSession],
-          session: updatedConversation.currentSession,
-          summary: updatedConversation.summary,
-        } as ChatBody),
-      })
-
-      if (!response.ok) {
-        setLoading(false)
-        throw new Error(response.statusText)
-      }
-
-      const data = response.body
-
-      if (!data) {
-        return
-      }
-
-      setLoading(false)
-
-      const reader = data.getReader()
-      const decoder = new TextDecoder()
-      let done = false
-      let isFirst = true
-      let text = ''
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read()
-        done = doneReading
-        const chunkValue = decoder.decode(value)
-        let updatedMessages: Message[]
-
-        text += chunkValue
-
-        if (isFirst) {
-          isFirst = false
-          updatedMessages = [
-            ...updatedConversation.messages[updatedConversation.currentSession],
-            { role: 'assistant', content: chunkValue },
-          ]
-        } else {
-          updatedMessages = updatedConversation.messages[
-            updatedConversation.currentSession
-          ].map((message, index) => {
-            if (
-              index ===
-              updatedConversation.messages[updatedConversation.currentSession]
-                .length -
-                1
-            ) {
-              return {
-                ...message,
-                content: text,
+  const handleSend = useCallback(
+    async (message: Message | null) => {
+      if (selectedConversation) {
+        let updatedConversation: Conversation =
+          message === null
+            ? selectedConversation
+            : {
+                ...selectedConversation,
+                // messages: [...selectedConversation.messages, message],
+                messages: {
+                  ...selectedConversation.messages,
+                  [selectedConversation.currentSession]: [
+                    ...selectedConversation.messages[
+                      selectedConversation.currentSession
+                    ],
+                    message,
+                  ],
+                },
               }
-            }
-
-            return message
-          })
-        }
-        updatedConversation = {
-          ...updatedConversation,
-          messages: {
-            ...selectedConversation.messages,
-            [selectedConversation.currentSession]: updatedMessages,
-          },
-        }
 
         setSelectedConversation(updatedConversation)
-      }
+        setLoading(true)
 
-      const functionCallRes = await fetch('/api/function', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model,
-          messages:
-            updatedConversation.messages[updatedConversation.currentSession],
-          session: updatedConversation.currentSession,
-          summary: updatedConversation.summary,
-        } as ChatBody),
-      })
-
-      const { sessionEnded, summary } = await functionCallRes.json()
-      console.log('sessionEnded: ', sessionEnded)
-      console.log('summary: ', summary)
-      alert('Session Ended: ' + sessionEnded)
-      if (sessionEnded) {
-        const nextSession = incrementSession(updatedConversation.currentSession)
-        alert('Session Summary: ' + summary)
-        updatedConversation = {
-          ...updatedConversation,
-          currentSession: nextSession,
-          summary: {
-            ...updatedConversation.summary,
-            [updatedConversation.currentSession]: summary,
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            model,
+            messages:
+              updatedConversation.messages[updatedConversation.currentSession],
+            session: updatedConversation.currentSession,
+            summary: updatedConversation.summary,
+          } as ChatBody),
+        })
+
+        if (!response.ok) {
+          setLoading(false)
+          throw new Error(response.statusText)
         }
-        setSelectedConversation(updatedConversation)
-      }
 
-      // localStorage.setItem(
-      //   'selectedConversation',
-      //   JSON.stringify(updatedConversation),
-      // )
+        const data = response.body
 
-      const conversationRef = doc(db, 'therapy', currentUser!.uid)
-      await setDoc(conversationRef, updatedConversation)
+        if (!data) {
+          return
+        }
 
-      const updatedConversations: Conversation[] = conversations.map(
-        (conversation) => {
-          if (conversation.id === selectedConversation.id) {
-            return updatedConversation
+        setLoading(false)
+
+        const reader = data.getReader()
+        const decoder = new TextDecoder()
+        let done = false
+        let isFirst = true
+        let text = ''
+
+        while (!done) {
+          const { value, done: doneReading } = await reader.read()
+          done = doneReading
+          const chunkValue = decoder.decode(value)
+          let updatedMessages: Message[]
+
+          text += chunkValue
+
+          if (isFirst) {
+            isFirst = false
+            updatedMessages = [
+              ...updatedConversation.messages[
+                updatedConversation.currentSession
+              ],
+              { role: 'assistant', content: chunkValue },
+            ]
+          } else {
+            updatedMessages = updatedConversation.messages[
+              updatedConversation.currentSession
+            ].map((message, index) => {
+              if (
+                index ===
+                updatedConversation.messages[updatedConversation.currentSession]
+                  .length -
+                  1
+              ) {
+                return {
+                  ...message,
+                  content: text,
+                }
+              }
+
+              return message
+            })
+          }
+          updatedConversation = {
+            ...updatedConversation,
+            messages: {
+              ...selectedConversation.messages,
+              [selectedConversation.currentSession]: updatedMessages,
+            },
           }
 
-          return conversation
-        },
-      )
+          setSelectedConversation(updatedConversation)
+        }
 
-      if (updatedConversations.length === 0) {
-        updatedConversations.push(updatedConversation)
+        const functionCallRes = await fetch('/api/function', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model,
+            messages:
+              updatedConversation.messages[updatedConversation.currentSession],
+            session: updatedConversation.currentSession,
+            summary: updatedConversation.summary,
+          } as ChatBody),
+        })
+
+        const { sessionEnded, summary } = await functionCallRes.json()
+        console.log('sessionEnded: ', sessionEnded)
+        console.log('summary: ', summary)
+        alert('Session Ended: ' + sessionEnded)
+        if (sessionEnded) {
+          const nextSession = incrementSession(
+            updatedConversation.currentSession,
+          )
+          alert('Session Summary: ' + summary)
+          updatedConversation = {
+            ...updatedConversation,
+            currentSession: nextSession,
+            summary: {
+              ...updatedConversation.summary,
+              [updatedConversation.currentSession]: summary,
+            },
+          }
+          setSelectedConversation(updatedConversation)
+        }
+
+        // localStorage.setItem(
+        //   'selectedConversation',
+        //   JSON.stringify(updatedConversation),
+        // )
+
+        const conversationRef = doc(db, 'therapy', currentUser!.uid)
+        await setDoc(conversationRef, updatedConversation)
+
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation
+            }
+
+            return conversation
+          },
+        )
+
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation)
+        }
+
+        setConversations(updatedConversations)
+
+        localStorage.setItem(
+          'conversationHistory',
+          JSON.stringify(updatedConversations),
+        )
       }
-
-      setConversations(updatedConversations)
-
-      localStorage.setItem(
-        'conversationHistory',
-        JSON.stringify(updatedConversations),
-      )
-    }
-  }
+    },
+    [conversations, model, selectedConversation, currentUser],
+  )
 
   const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode)
@@ -329,13 +339,13 @@ export default function Home() {
     })
   }, [currentUser])
 
-  // useEffect(() => {
-  //   if (
-  //     selectedConversation?.messages[SESSIONS.PROBLEM_DIAGNOSIS].length === 0
-  //   ) {
-  //     performGreetingAnimation(selectedConversation)
-  //   }
-  // }, [selectedConversation, conversations])
+  useEffect(() => {
+    if (
+      selectedConversation?.messages[SESSIONS.PROBLEM_DIAGNOSIS].length === 0
+    ) {
+      handleSend(null)
+    }
+  }, [selectedConversation, conversations, handleSend])
 
   useEffect(() => {
     function handleWindowResize() {
