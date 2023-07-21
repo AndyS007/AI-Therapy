@@ -7,7 +7,7 @@ import {
   summaryResponse,
   SYSTEM_PROMPT,
 } from '@/types/prompt'
-import { functionCallResponse, extractMessages } from '@/utils'
+import { functionCallResponse, extractMessages } from '@/utils/chats'
 
 export const config = {
   runtime: 'edge',

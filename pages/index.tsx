@@ -13,7 +13,7 @@ import { OpenAIModelID } from '@/types/openai'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { greetingMessage, incrementSession, SESSIONS } from '@/types/prompt'
+import { incrementSession, SESSIONS } from '@/types/prompt'
 import { db } from '@lib/firebase'
 
 export default function Home() {
@@ -25,7 +25,6 @@ export default function Home() {
     }
   }, [currentUser, router])
 
-  const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>()
   const [loading, setLoading] = useState<boolean>(false)
@@ -173,32 +172,12 @@ export default function Home() {
         //   JSON.stringify(updatedConversation),
         // )
 
+        //TODO: save to firestore and local storage if logged in, save to local storage if not
         const conversationRef = doc(db, 'therapy', currentUser!.uid)
         await setDoc(conversationRef, updatedConversation)
-
-        const updatedConversations: Conversation[] = conversations.map(
-          (conversation) => {
-            if (conversation.id === selectedConversation.id) {
-              return updatedConversation
-            }
-
-            return conversation
-          },
-        )
-
-        if (updatedConversations.length === 0) {
-          updatedConversations.push(updatedConversation)
-        }
-
-        setConversations(updatedConversations)
-
-        localStorage.setItem(
-          'conversationHistory',
-          JSON.stringify(updatedConversations),
-        )
       }
     },
-    [conversations, model, selectedConversation, currentUser],
+    [model, selectedConversation, currentUser],
   )
 
   const handleLightMode = (mode: 'dark' | 'light') => {
@@ -206,134 +185,37 @@ export default function Home() {
     localStorage.setItem('theme', mode)
   }
 
-  const handleNewConversation = async () => {
+  const handleRestartConversation = async () => {
     let newConversation: Conversation = {
       ...defaultConversation,
-      id: conversations.length + 1,
     }
 
     setSelectedConversation(newConversation)
-    let updatedConversations = [...conversations, newConversation]
-    setConversations(updatedConversations)
-
-    localStorage.setItem(
-      'selectedConversation',
-      JSON.stringify(newConversation),
-    )
-
-    localStorage.setItem(
-      'conversationHistory',
-      JSON.stringify(updatedConversations),
-    )
-
-    setModel(OpenAIModelID.GPT_3_5_16K)
-    setLoading(false)
   }
 
-  const handleSelectConversation = (conversation: Conversation) => {
-    setSelectedConversation(conversation)
-    localStorage.setItem('selectedConversation', JSON.stringify(conversation))
-  }
-
-  const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter(
-      (c) => c.id !== conversation.id,
-    )
-    setConversations(updatedConversations)
-    localStorage.setItem(
-      'conversationHistory',
-      JSON.stringify(updatedConversations),
-    )
-
-    if (updatedConversations.length > 0) {
-      setSelectedConversation(updatedConversations[0])
-      localStorage.setItem(
-        'selectedConversation',
-        JSON.stringify(updatedConversations[0]),
-      )
-    } else {
-      setSelectedConversation(defaultConversation)
-      localStorage.removeItem('selectedConversation')
-    }
-  }
-
-  async function performGreetingAnimation(newConversation: Conversation) {
-    let isFirst = true
-    const words = greetingMessage.content.split(/\s+/)
-    let text = ''
-    let updatedMessages: Message[]
-
-    if (newConversation) {
-      for (let i = 0; i < words.length; i++) {
-        const chunkValue = words[i] + ' '
-        text += chunkValue
-        if (isFirst) {
-          isFirst = false
-          updatedMessages = [
-            ...newConversation.messages[newConversation.currentSession],
-            { role: 'assistant', content: chunkValue },
-          ]
-        } else {
-          updatedMessages = newConversation.messages[
-            newConversation.currentSession
-          ].map((message, index) => {
-            if (
-              index ===
-              newConversation.messages[newConversation.currentSession].length -
-                1
-            ) {
-              return {
-                ...message,
-                content: text,
-              }
-            }
-
-            return message
-          })
-        }
-        newConversation = {
-          ...newConversation,
-          messages: {
-            ...newConversation.messages,
-            [newConversation.currentSession]: updatedMessages,
-          },
-        }
-
-        setSelectedConversation(newConversation)
-
-        await new Promise((resolve) => setTimeout(resolve, 50)) // Add a delay of 500 milliseconds
-      }
-    }
-    return newConversation
-  }
   useEffect(() => {
     const theme = localStorage.getItem('theme')
     if (theme) {
       setLightMode(theme as 'dark' | 'light')
     }
 
-    const conversationHistory = localStorage.getItem('conversationHistory')
-
-    if (conversationHistory) {
-      setConversations(JSON.parse(conversationHistory))
-    }
-
     // const selectedConversation = localStorage.getItem('selectedConversation')
     let selectedConversation
     if (currentUser === null) {
       console.log('currentUser is null')
+    } else {
+      getDoc(doc(db, 'therapy', currentUser.uid)).then((docSnap) => {
+        if (docSnap.exists()) {
+          selectedConversation = docSnap.data() as Conversation
+          console.log('Document data:', docSnap.data())
+          setSelectedConversation(selectedConversation)
+        } else {
+          // doc.data() will be undefined in this case
+          console.log('No document found! Creating new conversation')
+          setSelectedConversation(defaultConversation)
+        }
+      })
     }
-    getDoc(doc(db, 'therapy', currentUser!.uid)).then((docSnap) => {
-      if (docSnap.exists()) {
-        selectedConversation = docSnap.data() as Conversation
-        console.log('Document data:', docSnap.data())
-        setSelectedConversation(selectedConversation)
-      } else {
-        // doc.data() will be undefined in this case
-        console.log('No document found! Creating new conversation')
-        setSelectedConversation(defaultConversation)
-      }
-    })
   }, [currentUser])
 
   useEffect(() => {
@@ -342,28 +224,7 @@ export default function Home() {
     ) {
       handleSend(null)
     }
-  }, [selectedConversation, conversations, handleSend])
-
-  useEffect(() => {
-    function handleWindowResize() {
-      if (window.innerWidth < 640) {
-        setShowSidebar(false)
-      } else {
-        setShowSidebar(true)
-      }
-    }
-
-    // Call the handler once to set the initial value
-    handleWindowResize()
-
-    // Add event listener for window resize
-    window.addEventListener('resize', handleWindowResize)
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      window.removeEventListener('resize', handleWindowResize)
-    }
-  }, [])
+  }, [selectedConversation, handleSend])
 
   return (
     <>
@@ -375,17 +236,7 @@ export default function Home() {
       </Head>
       {selectedConversation && (
         <div className={`flex h-screen text-white ${lightMode}`}>
-          {showSidebar && (
-            <Sidebar
-              conversations={conversations}
-              lightMode={lightMode}
-              selectedConversation={selectedConversation}
-              onToggleLightMode={handleLightMode}
-              onNewConversation={handleNewConversation}
-              onSelectConversation={handleSelectConversation}
-              onDeleteConversation={handleDeleteConversation}
-            />
-          )}
+          {/*<Sidebar lightMode={lightMode} onToggleLightMode={handleLightMode} />*/}
 
           <div className="flex flex-col w-full h-full dark:bg-[#343541] overflow-x-hidden">
             <Chat
@@ -401,6 +252,7 @@ export default function Home() {
               loading={loading}
               onSend={handleSend}
               onSelect={setModel}
+              onRestart={handleRestartConversation}
             />
           </div>
         </div>

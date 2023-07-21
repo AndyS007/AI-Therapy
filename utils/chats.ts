@@ -43,7 +43,7 @@ export const extractMessages = async (
     tokenCount += tokens.length
     messagesToSend = [message, ...messagesToSend]
   }
-  console.log('Final token count: ', tokenCount)
+  // console.log('Final token count: ', tokenCount)
   // encoding.free()
 
   return messagesToSend

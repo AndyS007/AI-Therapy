@@ -1,12 +1,13 @@
 import { Message } from '@/types/chat'
-import { IconSend } from '@tabler/icons-react'
-import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react'
+import { IconRepeat, IconSend } from '@tabler/icons-react'
+import React, { FC, KeyboardEvent, useEffect, useRef, useState } from 'react'
 
 interface Props {
   onSend: (message: Message) => void
+  onRestart: () => void
 }
 
-export const ChatInput: FC<Props> = ({ onSend }) => {
+export const ChatInput: FC<Props> = ({ onSend, onRestart }) => {
   const [content, setContent] = useState<string>()
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -69,6 +70,14 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
+
+        <button
+          className="absolute bottom-20 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+          onClick={onRestart}
+        >
+          <IconRepeat size={18} />
+          {'Restart'}
+        </button>
         <button
           className="absolute right-2 bottom-[14px] text-neutral-400 p-2 hover:dark:bg-neutral-800 hover:bg-neutral-400 hover:text-white rounded-md"
           onClick={handleSend}

@@ -1,7 +1,6 @@
 import { Message } from '@/types/chat'
 import { OpenAIModelID } from '@/types/openai'
-import { FC, useEffect, useRef } from 'react'
-import { ModelSelect } from '../ModelSelect'
+import React, { FC, useEffect, useRef } from 'react'
 import { ChatInput } from './ChatInput'
 import { ChatLoader } from './ChatLoader'
 import { ChatMessage } from './ChatMessage'
@@ -14,6 +13,7 @@ interface Props {
   loading: boolean
   onSend: (message: Message) => void
   onSelect: (model: OpenAIModelID) => void
+  onRestart: () => void
 }
 
 export const Chat: FC<Props> = ({
@@ -23,6 +23,7 @@ export const Chat: FC<Props> = ({
   loading,
   onSend,
   onSelect,
+  onRestart,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -36,17 +37,7 @@ export const Chat: FC<Props> = ({
 
   return (
     <div className="h-full flex flex-col">
-      {messages.length === 0 ? (
-        <>
-          <div className="flex justify-center pt-8">
-            <ModelSelect model={model} onSelect={onSelect} />
-          </div>
-
-          <div className="flex-1 text-4xl text-center text-neutral-300 pt-[280px]">
-            AI Therapy
-          </div>
-        </>
-      ) : (
+      {
         <>
           <div className="flex-1 overflow-auto ">
             <div className="sticky  top-0  flex justify-center bg-neutral-100   py-3 dark:bg-[#434654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">
@@ -63,10 +54,10 @@ export const Chat: FC<Props> = ({
             <div ref={messagesEndRef} />
           </div>
         </>
-      )}
+      }
 
       <div className="h-[140px] w-[800px] mx-auto">
-        <ChatInput onSend={onSend} />
+        <ChatInput onSend={onSend} onRestart={onRestart} />
       </div>
     </div>
   )

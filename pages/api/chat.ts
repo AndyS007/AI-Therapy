@@ -1,4 +1,4 @@
-import { extractMessages, OpenAIStream } from '@/utils'
+import { extractMessages, OpenAIStream } from '@/utils/chats'
 import { ChatBody } from '@/types/chat'
 import { summaryGenerator, SYSTEM_PROMPT } from '@/types/prompt'
 
